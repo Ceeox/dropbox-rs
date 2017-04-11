@@ -1,0 +1,12 @@
+[package]
+name = "dropbox"
+version = "0.1.0"
+authors = ["souryo <dev.souryo@gmail.com>"]
+
+[dependencies]
+serde = "0.9"
+serde_derive = "0.9"
+serde_json = "0.9"
+hyper = "0.10"
+hyper-native-tls = "0"
+log = "0.3"
