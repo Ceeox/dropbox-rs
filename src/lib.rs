@@ -9,16 +9,17 @@ extern crate hyper_native_tls;
 // extern mods
 // intern mods
 mod tests;
-
 pub mod models;
 pub mod error;
-pub mod connection;
 #[macro_use] mod macros;
-
 pub mod files;
 // std uses
+use std::io::Read;
 // crate uses
-use log::{ LogRecord, LogLevel, LogMetadata, LogLevelFilter };
+use hyper::Client;
+use hyper::net::HttpsConnector;
+use hyper_native_tls::NativeTlsClient;
+use hyper::header::*;
 // intern uses
 use ::error::*;
 // consts or statics
@@ -26,32 +27,45 @@ static BASE_URL: &'static str = "https://api.dropboxapi.com";
 static UPLOAD_URL: &'static str = "https://content.dropboxapi.com";
 static API_VERSION: &'static str = "/2";
 // etc
-pub struct Logger;
-
-impl log::Log for Logger
+pub struct Dropbox
 {
-	fn enabled(&self, metadata: &LogMetadata)
-	-> bool
-	{
-		metadata.level() <= LogLevel::Trace
-	}
-
-	fn log(&self, record: &LogRecord)
-	{
-		if self.enabled(record.metadata())
-		{
-			println!("[{}] {}", record.level(), record.args())
-		}
-	}
+	client: hyper::Client,
+	header: hyper::header::Headers,
 }
 
-pub fn init(log_level: LogLevelFilter)
--> Result<()>
+impl Dropbox
 {
-	let _ = log::set_logger(|max_log_level|
+	pub fn new(token: String)
+	-> Result<Self>
 	{
-		max_log_level.set(log_level);
-		Box::new(Logger)
-    });
-	Ok(())
+		let mut h = Headers::new();
+		h.set(Authorization(Bearer { token: token }));
+		h.set(ContentType::json());
+
+		let ssl = NativeTlsClient::new().unwrap();
+		let connector = HttpsConnector::new(ssl);
+		let client = Client::with_connector(connector);
+
+		Ok(Dropbox
+		{
+			client: client,
+			header: h,
+		})
+	}
+
+	fn send_request(&self, uri: String, body: String)
+	-> Result<String>
+	{
+		debug!("uri: {:?}, {:?}", &uri, &body);
+		let header = self.header.clone();
+		info!("{:?}", header);
+		let mut resp = self.client.post(&uri)
+			.headers(header)
+			.body(&body)
+			.send()?;
+		trace!("{:?}", &resp);
+		let mut body = String::new();
+		resp.read_to_string(&mut body)?;
+		Ok(body)
+	}
 }
