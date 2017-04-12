@@ -69,6 +69,21 @@ pub enum RelocationBatchJobStatus
 	Failed(RelocationBatchError),
 }
 
+// /files/copy_reference/get
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct GetCopyReferenceArg
+{
+	path: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct GetCopyReferenceResult
+{
+	metadata: Metadata,
+	copy_reference: String,
+	expires: String,
+}
+
 // /get_account
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderArg
