@@ -86,3 +86,12 @@ impl From<Error<PollError>> for DropboxError
 		DropboxError::PollError(err)
 	}
 }
+
+impl From<Error<GetCopyReferenceError>> for DropboxError
+{
+	fn from(err: Error<GetCopyReferenceError>)
+	-> DropboxError
+	{
+		DropboxError::GetCopyReferenceError(err)
+	}
+}
