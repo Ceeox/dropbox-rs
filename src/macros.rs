@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! gen_uri
 {
-	( $api_class:expr, $($api_func:expr),* ) =>
+	( $api_class:expr, $($api_func:expr)* ) =>
 	({
 		use BASE_URL;
 		use API_VERSION;
