@@ -1,18 +1,18 @@
 use serde_json;
 
-use ::connection::DropboxConnection;
 use ::error::*;
+use ::Dropbox;
 use ::models::files::*;
 use ::models::error::*;
 
 pub struct DropboxFiles<'a>
 {
-	conn: &'a DropboxConnection,
+	conn: &'a Dropbox,
 }
 
 impl<'a> DropboxFiles<'a>
 {
-	pub fn new(conn: &'a DropboxConnection)
+	pub fn new(conn: &'a Dropbox)
 	-> Result<DropboxFiles<'a>>
 	{
 		Ok(DropboxFiles
@@ -82,9 +82,21 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn copy_reference_get()
+	pub fn copy_reference_get(&self, arg: GetCopyReferenceArg)
+	-> Result<GetCopyReferenceResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "copy_reference", "get");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.conn.send_request(uri, body)?;
+		match serde_json::from_str::<GetCopyReferenceResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<GetCopyReferenceError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::GetCopyReferenceError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
 	pub fn copy_reference_save()

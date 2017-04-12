@@ -94,6 +94,13 @@ pub enum PollError
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum GetCopyReferenceError
+{
+	#[serde(rename="path")]
+	Path{ path: LookupError},
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum LookUpPropertiesError
 {
 	#[serde(rename="property_group_not_found")]

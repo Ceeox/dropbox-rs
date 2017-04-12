@@ -19,6 +19,7 @@ pub enum DropboxError
 	ListFolderError(Error<ListFolderError>),
 	RelocationError(Error<RelocationError>),
 	PollError(Error<PollError>),
+	GetCopyReferenceError(Error<GetCopyReferenceError>),
 
 	Other,
 }
