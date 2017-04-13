@@ -117,10 +117,21 @@ pub enum SaveCopyReferenceError
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
 pub enum CreateFolderError
 {
 	#[serde(rename="path")]
 	Path(WriteError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum DeleteError
+{
+	#[serde(rename="path_lookup")]
+	PathLookup(LookupError),
+	#[serde(rename="path_write")]
+	PathWrite(WriteError),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

@@ -92,6 +92,12 @@ pub struct SaveCopyReferenceArg
 	pub path: String
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SaveCopyReferenceResult
+{
+	pub metadata: Metadata,
+}
+
 // /files/create_folder
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct CreateFolderArg
@@ -100,10 +106,11 @@ pub struct CreateFolderArg
 	pub autorename: bool,
 }
 
+// /files/delete
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct SaveCopyReferenceResult
+pub struct DeleteArg
 {
-	pub metadata: Metadata,
+	pub path: String,
 }
 
 // /files/get_account

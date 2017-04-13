@@ -21,6 +21,7 @@ pub enum DropboxError
 	GetCopyReferenceError(Error<GetCopyReferenceError>),
 	SaveCopyReferenceError(Error<SaveCopyReferenceError>),
 	CreateFolderError(Error<CreateFolderError>),
+	DeleteError(Error<DeleteError>),
 	ListFolderError(Error<ListFolderError>),
 
 	Other,
@@ -59,15 +60,6 @@ impl From<SerdeJsonError> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::JsonError(err)
-	}
-}
-
-impl From<Error<ListFolderError>> for DropboxError
-{
-	fn from(err: Error<ListFolderError>)
-	-> DropboxError
-	{
-		DropboxError::ListFolderError(err)
 	}
 }
 
@@ -113,5 +105,23 @@ impl From<Error<CreateFolderError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::CreateFolderError(err)
+	}
+}
+
+impl From<Error<DeleteError>> for DropboxError
+{
+	fn from(err: Error<DeleteError>)
+	-> DropboxError
+	{
+		DropboxError::DeleteError(err)
+	}
+}
+
+impl From<Error<ListFolderError>> for DropboxError
+{
+	fn from(err: Error<ListFolderError>)
+	-> DropboxError
+	{
+		DropboxError::ListFolderError(err)
 	}
 }

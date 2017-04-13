@@ -133,9 +133,21 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn delete()
+	pub fn delete(&self, arg: DeleteArg)
+	-> Result<Metadata>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "delete");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.conn.send_request(uri, body)?;
+		match serde_json::from_str::<Metadata>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<DeleteError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::DeleteError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
 	pub fn delete_batch()
