@@ -113,7 +113,7 @@ pub struct DeleteArg
 	pub path: String,
 }
 
-// /files/delte_batch
+// /files/delete_batch
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct DeleteBatchArg
 {
@@ -149,6 +149,33 @@ pub enum DeleteBatchResultEntry
 pub struct DeleteResult
 {
 	pub metadata: Metadata,
+}
+
+// /files/delete_batch/check
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum DeleteBatchJobStatus
+{
+	#[serde(rename="in_progress")]
+	InProgress,
+	#[serde(rename="complete")]
+	Complete(DeleteBatchResult),
+	#[serde(rename="failed")]
+	Failed(DeleteBatchError)
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum DeleteBatchError
+{
+	#[serde(rename="too_many_write_operations")]
+	TooManyWriteOperations,
+}
+
+// /files/download
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct DownloadArg
+{
+	pub path: String,
 }
 
 // /files/get_account

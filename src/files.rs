@@ -7,17 +7,17 @@ use ::models::error::*;
 
 pub struct DropboxFiles<'a>
 {
-	conn: &'a Dropbox,
+	dropbox: &'a Dropbox,
 }
 
 impl<'a> DropboxFiles<'a>
 {
-	pub fn new(conn: &'a Dropbox)
+	pub fn new(dropbox: &'a Dropbox)
 	-> Result<DropboxFiles<'a>>
 	{
 		Ok(DropboxFiles
 		{
-			conn: conn,
+			dropbox: dropbox,
 		})
 	}
 
@@ -40,7 +40,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<Metadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<RelocationError>>(&resp)
@@ -57,7 +57,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy_batch");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<RelocationBatchLaunch>(&resp)
 		{
 			Err(_) => Err(DropboxError::Other),
@@ -70,7 +70,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<RelocationBatchJobStatus>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
@@ -87,7 +87,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy_reference", "get");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<GetCopyReferenceResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<GetCopyReferenceError>>(&resp)
@@ -104,7 +104,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy_reference", "save");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<SaveCopyReferenceResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<SaveCopyReferenceError>>(&resp)
@@ -121,7 +121,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "create_folder");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<FolderMetadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<CreateFolderError>>(&resp)
@@ -138,7 +138,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "delete");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<Metadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<DeleteError>>(&resp)
@@ -155,7 +155,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "delete_batch");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<DeleteBatchLaunch>(&resp)
 		{
 			Err(_) => Err(DropboxError::Other),
@@ -163,14 +163,35 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn delete_batch_check()
+	pub fn delete_batch_check(&self, arg: PollArg)
+	-> Result<DeleteBatchJobStatus>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "delete_batch", "check");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<DeleteBatchJobStatus>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::PollError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn download()
+	pub fn download(&self, arg: DownloadArg)
+	-> Result<(FileMetadata, Vec<u8>)>
 	{
-		unimplemented!();
+		let uri = gen_upload_uri!("files", "download");
+		let body: String = serde_json::to_string(&arg)?;
+		let (file_info, buffer) = self.dropbox.download(uri, body)?;
+		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
+		{
+			Err(_) => return Err(DropboxError::Other),
+			Ok(r) => r,
+		};
+		Ok((file_info, buffer))
 	}
 
 	pub fn get_metadata()
@@ -198,7 +219,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "list_folder");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.conn.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
 		match serde_json::from_str::<ListFolderResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<ListFolderError>>(&resp)

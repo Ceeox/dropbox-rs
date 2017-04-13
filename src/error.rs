@@ -23,6 +23,7 @@ pub enum DropboxError
 	CreateFolderError(Error<CreateFolderError>),
 	DeleteError(Error<DeleteError>),
 	ListFolderError(Error<ListFolderError>),
+	DownloadError(Error<DownloadError>),
 
 	Other,
 }
@@ -114,6 +115,15 @@ impl From<Error<DeleteError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::DeleteError(err)
+	}
+}
+
+impl From<Error<DownloadError>> for DropboxError
+{
+	fn from(err: Error<DownloadError>)
+	-> DropboxError
+	{
+		DropboxError::DownloadError(err)
 	}
 }
 

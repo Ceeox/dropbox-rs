@@ -25,11 +25,11 @@
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 extern crate serde_json;
-extern crate hyper;
+#[macro_use] extern crate hyper;
 extern crate hyper_native_tls;
 // extern mods
 // intern mods
-mod tests;
+#[cfg(test)] mod tests;
 pub mod models;
 pub mod error;
 #[macro_use] mod macros;
@@ -61,7 +61,6 @@ impl Dropbox
 	{
 		let mut h = Headers::new();
 		h.set(Authorization(Bearer { token: token }));
-		h.set(ContentType::json());
 
 		let ssl = NativeTlsClient::new().unwrap();
 		let connector = HttpsConnector::new(ssl);
@@ -77,8 +76,9 @@ impl Dropbox
 	fn send_request(&self, uri: String, body: String)
 	-> Result<String>
 	{
-		debug!("uri: {:?}, {:?}", &uri, &body);
-		let header = self.header.clone();
+		debug!("uri: {:?}\nbody: {:?}", &uri, &body);
+		let mut header = self.header.clone();
+		header.set(ContentType::json());
 		info!("{:?}", header);
 		let mut resp = self.client.post(&uri)
 			.headers(header)
@@ -87,6 +87,31 @@ impl Dropbox
 		trace!("{:?}", &resp);
 		let mut body = String::new();
 		resp.read_to_string(&mut body)?;
+		trace!("{:?}", &body);
 		Ok(body)
+	}
+
+	fn download(&self, uri: String, body: String)
+	-> Result<(String, Vec<u8>)>
+	{
+		let mut header = self.header.clone();
+		header!{ (DropboxApiArg, "Dropbox-API-Arg") => [String] };
+		header.set(DropboxApiArg(body.to_owned()));
+		debug!("header: {:?}\nuri: {:?}\nbody: {:?}", &header, &uri, &body);
+		let mut resp = self.client.post(&uri)
+			.headers(header)
+			.send()?;
+		trace!("{:?}", &resp);
+		let mut buffer = Vec::new();
+		resp.read_to_end(&mut buffer)?;
+		let file_info = match resp.headers.iter()
+			.find(|i| i.name() == "dropbox-api-result")
+			.map(|i| i.value_string())
+		{
+			None => return Err(DropboxError::Other),
+			Some(r) => r,
+		};
+		trace!("{:?}", &file_info);
+		Ok((file_info, buffer))
 	}
 }
