@@ -116,9 +116,21 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn create_folder()
+	pub fn create_folder(&self, arg: CreateFolderArg)
+	-> Result<FolderMetadata>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "create_folder");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.conn.send_request(uri, body)?;
+		match serde_json::from_str::<FolderMetadata>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<CreateFolderError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::CreateFolderError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
 	pub fn delete()

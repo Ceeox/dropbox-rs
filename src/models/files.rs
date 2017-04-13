@@ -92,6 +92,14 @@ pub struct SaveCopyReferenceArg
 	pub path: String
 }
 
+// /files/create_folder
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct CreateFolderArg
+{
+	pub path: String,
+	pub autorename: bool,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct SaveCopyReferenceResult
 {

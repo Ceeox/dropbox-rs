@@ -16,11 +16,12 @@ pub enum DropboxError
 	IoError(StdIoError),
 	JsonError(SerdeJsonError),
 
-	ListFolderError(Error<ListFolderError>),
 	RelocationError(Error<RelocationError>),
 	PollError(Error<PollError>),
 	GetCopyReferenceError(Error<GetCopyReferenceError>),
 	SaveCopyReferenceError(Error<SaveCopyReferenceError>),
+	CreateFolderError(Error<CreateFolderError>),
+	ListFolderError(Error<ListFolderError>),
 
 	Other,
 }
@@ -103,5 +104,14 @@ impl From<Error<SaveCopyReferenceError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::SaveCopyReferenceError(err)
+	}
+}
+
+impl From<Error<CreateFolderError>> for DropboxError
+{
+	fn from(err: Error<CreateFolderError>)
+	-> DropboxError
+	{
+		DropboxError::CreateFolderError(err)
 	}
 }

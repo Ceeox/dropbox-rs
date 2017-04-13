@@ -117,6 +117,13 @@ pub enum SaveCopyReferenceError
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum CreateFolderError
+{
+	#[serde(rename="path")]
+	Path(WriteError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum LookUpPropertiesError
 {
 	#[serde(rename="property_group_not_found")]
