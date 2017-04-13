@@ -188,7 +188,11 @@ impl<'a> DropboxFiles<'a>
 		let (file_info, buffer) = self.dropbox.download(uri, body)?;
 		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
 		{
-			Err(_) => return Err(DropboxError::Other),
+			Err(_) => return Err(match serde_json::from_str::<Error<DownloadError>>(&file_info)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::DownloadError(r),
+			}),
 			Ok(r) => r,
 		};
 		Ok((file_info, buffer))
