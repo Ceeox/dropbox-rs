@@ -1,12 +1,12 @@
 use ::models::error::*;
 
-// /alpha/get_metadata
+// /files/alpha/get_metadata
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct AlphaGetMetadataArg
 {
 }
 
-// /copy
+// /files/copy
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct RelocationArg
 {
@@ -16,7 +16,7 @@ pub struct RelocationArg
 	pub autorename: bool,
 }
 
-// /copy_batch
+// /files/copy_batch
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct RelocationBatchArg
 {
@@ -51,11 +51,11 @@ pub struct RelocationResult
 	pub metadata: Metadata,
 }
 
-// /copy_batch/check
+// /files/copy_batch/check
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct PollArg
 {
-	async_job_id: String,
+	pub async_job_id: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -73,18 +73,32 @@ pub enum RelocationBatchJobStatus
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct GetCopyReferenceArg
 {
-	path: String,
+	pub path: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct GetCopyReferenceResult
 {
-	metadata: Metadata,
-	copy_reference: String,
-	expires: String,
+	pub metadata: Metadata,
+	pub copy_reference: String,
+	pub expires: String,
 }
 
-// /get_account
+// /files/copy_reference/save
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SaveCopyReferenceArg
+{
+	pub copy_reference: String,
+	pub path: String
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SaveCopyReferenceResult
+{
+	pub metadata: Metadata,
+}
+
+// /files/get_account
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderArg
 {

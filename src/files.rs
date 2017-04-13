@@ -99,9 +99,21 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn copy_reference_save()
+	pub fn copy_reference_save(&self, arg: SaveCopyReferenceArg)
+	-> Result<SaveCopyReferenceResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "copy_reference", "save");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.conn.send_request(uri, body)?;
+		match serde_json::from_str::<SaveCopyReferenceResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<SaveCopyReferenceError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::SaveCopyReferenceError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
 	pub fn create_folder()

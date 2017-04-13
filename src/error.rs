@@ -20,6 +20,7 @@ pub enum DropboxError
 	RelocationError(Error<RelocationError>),
 	PollError(Error<PollError>),
 	GetCopyReferenceError(Error<GetCopyReferenceError>),
+	SaveCopyReferenceError(Error<SaveCopyReferenceError>),
 
 	Other,
 }
@@ -93,5 +94,14 @@ impl From<Error<GetCopyReferenceError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::GetCopyReferenceError(err)
+	}
+}
+
+impl From<Error<SaveCopyReferenceError>> for DropboxError
+{
+	fn from(err: Error<SaveCopyReferenceError>)
+	-> DropboxError
+	{
+		DropboxError::SaveCopyReferenceError(err)
 	}
 }

@@ -101,6 +101,22 @@ pub enum GetCopyReferenceError
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum SaveCopyReferenceError
+{
+	#[serde(rename="path")]
+	Path(WriteError),
+	#[serde(rename="invalid_copy_reference")]
+	InvalidCopyReference,
+	#[serde(rename="no_permission")]
+	NoPermission,
+	#[serde(rename="not_found")]
+	NotFound,
+	#[serde(rename="too_many_files")]
+	TooManyFiles,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum LookUpPropertiesError
 {
 	#[serde(rename="property_group_not_found")]
