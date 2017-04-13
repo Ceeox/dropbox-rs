@@ -113,6 +113,44 @@ pub struct DeleteArg
 	pub path: String,
 }
 
+// /files/delte_batch
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct DeleteBatchArg
+{
+	pub entries: Vec<DeleteArg>
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum DeleteBatchLaunch
+{
+	#[serde(rename="async_job_id")]
+	AsyncJobId{ async_job_id: String },
+	#[serde(rename="complete")]
+	Complete(DeleteBatchResult),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct DeleteBatchResult
+{
+	pub entries: Vec<DeleteBatchResultEntry>
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum DeleteBatchResultEntry
+{
+	#[serde(rename="success")]
+	Success(DeleteResult),
+	#[serde(rename="failure")]
+	Failure(DeleteError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct DeleteResult
+{
+	pub metadata: Metadata,
+}
+
 // /files/get_account
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderArg

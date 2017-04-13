@@ -150,9 +150,17 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn delete_batch()
+	pub fn delete_batch(&self, arg: DeleteBatchArg)
+	-> Result<DeleteBatchLaunch>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "delete_batch");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.conn.send_request(uri, body)?;
+		match serde_json::from_str::<DeleteBatchLaunch>(&resp)
+		{
+			Err(_) => Err(DropboxError::Other),
+			Ok(r) => Ok(r),
+		}
 	}
 
 	pub fn delete_batch_check()
