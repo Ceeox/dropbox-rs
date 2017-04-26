@@ -185,7 +185,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_upload_uri!("files", "download");
 		let body: String = serde_json::to_string(&arg)?;
-		let (file_info, buffer) = self.dropbox.download(uri, body)?;
+		let (file_info, file) = self.dropbox.download(uri, body)?;
 		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
 		{
 			Err(_) => return Err(match serde_json::from_str::<Error<DownloadError>>(&file_info)
@@ -195,27 +195,77 @@ impl<'a> DropboxFiles<'a>
 			}),
 			Ok(r) => r,
 		};
-		Ok((file_info, buffer))
+		Ok((file_info, file))
 	}
 
-	pub fn get_metadata()
+	pub fn get_metadata(&self, arg: GetMetadataArg)
+	-> Result<Metadata>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "get_metadata");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<Metadata>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<GetMetadataError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::GetMetadataError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn get_preview()
+	pub fn get_preview(&self, arg:  PreviewArg)
+	-> Result<(FileMetadata, Vec<u8>)>
 	{
-		unimplemented!();
+		let uri = gen_upload_uri!("files", "get_preview");
+		let body: String = serde_json::to_string(&arg)?;
+		let (file_info, file) = self.dropbox.download(uri, body)?;
+		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
+		{
+			Err(_) => return Err(match serde_json::from_str::<Error<PreviewError>>(&file_info)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::PreviewError(r),
+			}),
+			Ok(r) => r,
+		};
+		Ok((file_info, file))
 	}
 
-	pub fn get_temporary_link()
+	pub fn get_temporary_link(&self, arg: GetTemporaryLinkArg)
+	-> Result<GetTemporaryLinkResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "get_temporary_link");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<GetTemporaryLinkResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<GetTemporaryLinkError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::GetTemporaryLinkError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn get_thumbnail()
+	pub fn get_thumbnail(&self, arg: ThumbnailArg)
+	-> Result<(FileMetadata, Vec<u8>)>
 	{
-		unimplemented!();
+		let uri = gen_upload_uri!("files", "get_thumbnail");
+		let body: String = serde_json::to_string(&arg)?;
+		let (file_info, file) = self.dropbox.download(uri, body)?;
+		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
+		{
+			Err(_) => return Err(match serde_json::from_str::<Error<ThumbnailError>>(&file_info)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::ThumbnailError(r),
+			}),
+			Ok(r) => r,
+		};
+		Ok((file_info, file))
 	}
 
 	pub fn list_folder(&self, arg: ListFolderArg)
@@ -235,29 +285,90 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn list_folders_continue()
+	pub fn list_folders_continue(&self, arg: ListFolderContinueArg)
+	-> Result<ListFolderResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "list_folders", "continue");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<ListFolderResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<ListFolderContinueError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::ListFolderContinueError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn list_folder_get_lates_cursor()
+	pub fn list_folder_get_latest_cursor(&self, arg: ListFolderArg)
+	-> Result<ListFolderGetLatestCursorResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "list_folders", "get_latest_cursor");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<ListFolderGetLatestCursorResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<ListFolderError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::ListFolderError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn list_folder_longpoll()
+	pub fn list_folder_longpoll(&self, arg: ListFolderLongpollArg)
+	-> Result<ListFolderLongpollResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "list_folders", "longpoll");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<ListFolderLongpollResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<ListFolderLongpollError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::ListFolderLongpollError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn list_revisions()
+	pub fn list_revisions(&self, arg: ListRevisionsArg)
+	-> Result<ListRevisionsResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "list_revisions");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<ListRevisionsResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<ListRevisionsError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::ListRevisionsError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn _move()
+	#[link_name="move"]
+	pub fn move_(&self, arg: RelocationArg)
+	-> Result<Metadata>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "move");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<Metadata>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<RelocationError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::RelocationError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
 	pub fn move_batch()
@@ -325,7 +436,7 @@ impl<'a> DropboxFiles<'a>
 		unimplemented!();
 	}
 
-	pub fn _upload()
+	pub fn upload()
 	{
 		unimplemented!();
 	}

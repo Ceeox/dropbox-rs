@@ -178,6 +178,114 @@ pub struct DownloadArg
 	pub path: String,
 }
 
+// /files/get_metadata
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct GetMetadataArg
+{
+	pub path: String,
+	pub include_media_info: bool,
+	pub include_deleted: bool,
+	pub include_has_explicit_shared_members: bool,
+}
+
+// /files/get_preview
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct PreviewArg
+{
+	pub path: String,
+}
+
+// /files/get_temporary_link
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct GetTemporaryLinkArg
+{
+	pub path: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct GetTemporaryLinkResult
+{
+	pub metadata: Metadata,
+	pub link: String,
+}
+
+// files/get_thumbnail
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct ThumbnailArg
+{
+	pub path: String,
+	pub format: ThumbnailFormat,
+	pub size: ThumbnailSize,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum ThumbnailFormat
+{
+	#[serde(rename="png")]
+	Png,
+	#[serde(rename="jpeg")]
+	Jpeg,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum ThumbnailSize
+{
+	#[serde(rename="w32h32")]
+	W32h32,
+	#[serde(rename="w64h64")]
+	W64h64,
+	#[serde(rename="w128h128")]
+	W128h128,
+	#[serde(rename="w640h640")]
+	W640h640,
+	#[serde(rename="w1024h1024")]
+	W1024h1024,
+}
+
+// /flies/list_folders/continue
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct ListFolderContinueArg
+{
+	pub cursor: String,
+}
+
+// /files/list_folder/get_latest_cursor
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct ListFolderGetLatestCursorResult
+{
+	pub cursor: String,
+}
+
+// /files/list_folder/longpoll
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct ListFolderLongpollArg
+{
+	pub cursor: String,
+	pub timeout: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct ListFolderLongpollResult
+{
+	pub changes: bool,
+	pub backoff: Option<u64>,
+}
+
+// /files/list_revisions
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct ListRevisionsArg
+{
+	pub path: String,
+	pub limit: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct ListRevisionsResult
+{
+	pub is_deleted: bool,
+	pub entries: Vec<FileMetadata>,
+}
+
 // /files/get_account
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderArg

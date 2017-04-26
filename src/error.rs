@@ -1,10 +1,11 @@
-// uses
+// std uses
 use std::string::FromUtf8Error;
 use std::io::Error as StdIoError;
-
-use ::models::error::*;
+// extern uses
 use hyper::error::Error as HyperErr;
 use serde_json::Error as SerdeJsonError;
+// intern uses
+use ::models::error::*;
 
 pub type Result<T> = ::std::result::Result<T, DropboxError>;
 
@@ -16,6 +17,7 @@ pub enum DropboxError
 	IoError(StdIoError),
 	JsonError(SerdeJsonError),
 
+	// Dropbox api errors
 	RelocationError(Error<RelocationError>),
 	PollError(Error<PollError>),
 	GetCopyReferenceError(Error<GetCopyReferenceError>),
@@ -23,7 +25,14 @@ pub enum DropboxError
 	CreateFolderError(Error<CreateFolderError>),
 	DeleteError(Error<DeleteError>),
 	ListFolderError(Error<ListFolderError>),
+	GetMetadataError(Error<GetMetadataError>),
 	DownloadError(Error<DownloadError>),
+	PreviewError(Error<PreviewError>),
+	GetTemporaryLinkError(Error<GetTemporaryLinkError>),
+	ThumbnailError(Error<ThumbnailError>),
+	ListFolderContinueError(Error<ListFolderContinueError>),
+	ListFolderLongpollError(Error<ListFolderLongpollError>),
+	ListRevisionsError(Error<ListRevisionsError>),
 
 	Other,
 }
@@ -127,11 +136,74 @@ impl From<Error<DownloadError>> for DropboxError
 	}
 }
 
+impl From<Error<GetMetadataError>> for DropboxError
+{
+	fn from(err: Error<GetMetadataError>)
+	-> DropboxError
+	{
+		DropboxError::GetMetadataError(err)
+	}
+}
+
+impl From<Error<PreviewError>> for DropboxError
+{
+	fn from(err: Error<PreviewError>)
+	-> DropboxError
+	{
+		DropboxError::PreviewError(err)
+	}
+}
+
+impl From<Error<GetTemporaryLinkError>> for DropboxError
+{
+	fn from(err: Error<GetTemporaryLinkError>)
+	-> DropboxError
+	{
+		DropboxError::GetTemporaryLinkError(err)
+	}
+}
+
+impl From<Error<ThumbnailError>> for DropboxError
+{
+	fn from(err: Error<ThumbnailError>)
+	-> DropboxError
+	{
+		DropboxError::ThumbnailError(err)
+	}
+}
+
 impl From<Error<ListFolderError>> for DropboxError
 {
 	fn from(err: Error<ListFolderError>)
 	-> DropboxError
 	{
 		DropboxError::ListFolderError(err)
+	}
+}
+
+impl From<Error<ListFolderContinueError>> for DropboxError
+{
+	fn from(err: Error<ListFolderContinueError>)
+	-> DropboxError
+	{
+		DropboxError::ListFolderContinueError(err)
+	}
+}
+
+impl From<Error<ListFolderLongpollError>> for DropboxError
+{
+	fn from(err: Error<ListFolderLongpollError>)
+	-> DropboxError
+	{
+		DropboxError::ListFolderLongpollError(err)
+	}
+}
+
+impl From<Error<ListRevisionsError>> for DropboxError
+{
+	fn from(err: Error<ListRevisionsError>)
+	-> DropboxError
+	{
+		DropboxError::ListRevisionsError(err)
 	}
 }

@@ -126,6 +126,75 @@ pub enum DownloadError
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
+pub enum GetMetadataError
+{
+	#[serde(rename="path")]
+	Path(LookupError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum PreviewError
+{
+	#[serde(rename="path")]
+	Path(LookupError),
+	#[serde(rename="in_prpgress")]
+	InProgress,
+	#[serde(rename="unsupported_extension")]
+	UnsupportedExtension,
+	#[serde(rename="unsupported_content")]
+	UnsupportedContent,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum GetTemporaryLinkError
+{
+	#[serde(rename="path")]
+	Path(LookupError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum ThumbnailError
+{
+	Path(LookupError),
+	#[serde(rename="unsupported_extension")]
+	UnsupportedExtension,
+	#[serde(rename="unsupported_image")]
+	UnsupportedImage,
+	#[serde(rename="conversion_error")]
+	ConversionError,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum ListFolderContinueError
+{
+	#[serde(rename="path")]
+	Path(LookupError),
+	#[serde(rename="reset")]
+	Reset,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum ListFolderLongpollError
+{
+	#[serde(rename="reset")]
+	Reset,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum ListRevisionsError
+{
+	#[serde(rename="path")]
+	Path(LookupError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
 pub enum CreateFolderError
 {
 	#[serde(rename="path")]
