@@ -33,6 +33,9 @@ pub enum DropboxError
 	ListFolderContinueError(Error<ListFolderContinueError>),
 	ListFolderLongpollError(Error<ListFolderLongpollError>),
 	ListRevisionsError(Error<ListRevisionsError>),
+	RestoreError(Error<RestoreError>),
+	SaveUrlError(Error<SaveUrlError>),
+	SearchError(Error<SearchError>),
 
 	Other,
 }
@@ -205,5 +208,32 @@ impl From<Error<ListRevisionsError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::ListRevisionsError(err)
+	}
+}
+
+impl From<Error<RestoreError>> for DropboxError
+{
+	fn from(err: Error<RestoreError>)
+	-> DropboxError
+	{
+		DropboxError::RestoreError(err)
+	}
+}
+
+impl From<Error<SaveUrlError>> for DropboxError
+{
+	fn from(err: Error<SaveUrlError>)
+	-> DropboxError
+	{
+		DropboxError::SaveUrlError(err)
+	}
+}
+
+impl From<Error<SearchError>> for DropboxError
+{
+	fn from(err: Error<SearchError>)
+	-> DropboxError
+	{
+		DropboxError::SearchError(err)
 	}
 }

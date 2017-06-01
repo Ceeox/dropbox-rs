@@ -22,14 +22,14 @@ impl<'a> DropboxFiles<'a>
 	}
 
 	/// PREVIEW - may change or disappear without notice
-	pub fn alpha_get_metadata()
+	pub fn alpha_get_metadata(&self)
 	-> Result<()>
 	{
 		Err(DropboxError::Other)
 	}
 
 	/// PREVIEW - may change or disappear without notice
-	pub fn alpha_upload()
+	pub fn alpha_upload(&self)
 	-> Result<()>
 	{
 		Err(DropboxError::Other)
@@ -354,7 +354,7 @@ impl<'a> DropboxFiles<'a>
 	}
 
 	#[link_name="move"]
-	pub fn move_(&self, arg: RelocationArg)
+	pub fn _move(&self, arg: RelocationArg)
 	-> Result<Metadata>
 	{
 		let uri = gen_uri!("files", "move");
@@ -371,69 +371,161 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn move_batch()
+	pub fn move_batch(&self, arg: RelocationBatchArg)
+	-> Result<RelocationBatchLaunch>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "move_batch");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<RelocationBatchLaunch>(&resp)
+		{
+			Err(_) => Err(DropboxError::Other),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn move_batch_check()
+	pub fn move_batch_check(&self, arg: PollArg)
+	-> Result<RelocationBatchJobStatus>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "move_batch", "check");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<RelocationBatchJobStatus>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::PollError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn permanetly_delete()
+	pub fn permanetly_delete(&self, arg: DeleteArg)
+	-> Result<()>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "permanetly_delete");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<Error<DeleteError>>(&resp)
+		{
+			Err(e) => match e.is_eof()
+			{
+				false => Err(DropboxError::Other),
+				true => Ok(()),
+			},
+			Ok(r) => Err(DropboxError::DeleteError(r)),
+		}
 	}
 
-	pub fn properties_add()
+	// PREVIEW - may change or disappear without notice
+	pub fn properties_add(&self)
+	-> Result<()>
 	{
-		unimplemented!();
+		Err(DropboxError::Other)
 	}
 
-	pub fn properties_overwride()
+	// PREVIEW - may change or disappear without notice
+	pub fn properties_overwride(&self)
+	-> Result<()>
 	{
-		unimplemented!();
+		Err(DropboxError::Other)
 	}
 
-	pub fn properties_remove()
+	// PREVIEW - may change or disappear without notice
+	pub fn properties_remove(&self)
+	-> Result<()>
 	{
-		unimplemented!();
+		Err(DropboxError::Other)
 	}
 
-	pub fn properties_template_get()
+	// PREVIEW - may change or disappear without notice
+	pub fn properties_template_get(&self)
+	-> Result<()>
 	{
-		unimplemented!();
+		Err(DropboxError::Other)
 	}
 
-	pub fn properties_template_list()
+	// PREVIEW - may change or disappear without notice
+	pub fn properties_template_list(&self)
+	-> Result<()>
 	{
-		unimplemented!();
+		Err(DropboxError::Other)
 	}
 
-	pub fn properties_update()
+	// PREVIEW - may change or disappear without notice
+	pub fn properties_update(&self)
+	-> Result<()>
 	{
-		unimplemented!();
+		Err(DropboxError::Other)
 	}
 
-	pub fn restore()
+	pub fn restore(&self, arg: RestoreArg)
+	-> Result<FileMetadata>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "restore");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<FileMetadata>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<RestoreError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::RestoreError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn save_url()
+	pub fn save_url(&self, arg: SaveUrlArg)
+	-> Result<SaveUrlResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "save_url");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<SaveUrlResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<SaveUrlError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::SaveUrlError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn save_url_check_jobstatus()
+	pub fn save_url_check_jobstatus(&self, arg: PollArg)
+	-> Result<SaveUrlJobStatus>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "save_url", "check_job_status");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<SaveUrlJobStatus>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::PollError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn search()
+	pub fn search(&self, arg: SearchArg)
+	-> Result<SearchResult>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "search");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(uri, body)?;
+		match serde_json::from_str::<SearchResult>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<SearchError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::SearchError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
 	pub fn upload()

@@ -443,3 +443,84 @@ pub struct DeletedMetadata
 	pub path_display: Option<String>,
 	pub parent_shared_folder_id: Option<String>,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct RestoreArg
+{
+	pub path: String,
+	pub rev: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct SaveUrlArg
+{
+	pub path: String,
+	pub url: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum SaveUrlResult
+{
+	#[serde(rename="async_job_id")]
+	AsyncJobId(String),
+	#[serde(rename="complete")]
+	Complete(FileMetadata),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum SaveUrlJobStatus
+{
+	#[serde(rename="in_progress")]
+	InProgress,
+	#[serde(rename="complete")]
+	Complete(FileMetadata),
+	#[serde(rename="failed")]
+	Failed(SaveUrlError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SearchArg
+{
+	pub path: String,
+	pub query: String,
+	pub start: u64,
+	pub max_results: u64,
+	pub mode: SearchMode,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum SearchMode
+{
+	#[serde(rename="filename")]
+	Filename,
+	#[serde(rename="filename_and_content")]
+	FilenameAndContent,
+	#[serde(rename="deleted_filename")]
+	DeletedFilename,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SearchResult
+{
+	pub matches: Vec<SearchMatch>,
+	pub more: bool,
+	pub start: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct SearchMatch
+{
+	pub match_type: SearchMatchType,
+	pub metadata: Metadata,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum SearchMatchType
+{
+	#[serde(rename="filename")]
+	Filename,
+	#[serde(rename="content")]
+	Content,
+	#[serde(rename="both")]
+	Both,
+}

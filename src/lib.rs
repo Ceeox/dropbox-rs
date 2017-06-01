@@ -1,25 +1,25 @@
 // License
 /*
- *The MIT License
- *Copyright (c) 2017 souryo <dev.souryo@gmail.com>.
+ * The MIT License
+ * Copyright (c) 2017 souryo <dev.souryo@gmail.com>.
  *
- *Permission is hereby granted, free of charge, to any person obtaining a copy
- *of this software and associated documentation files (the "Software"), to deal
- *in the Software without restriction, including without limitation the rights
- *to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *copies of the Software, and to permit persons to whom the Software is
- *furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- *The above copyright notice and this permission notice shall be included in
- *all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- *THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- *THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 // extern crates
 #[macro_use] extern crate log;
@@ -77,7 +77,7 @@ impl Dropbox
 	-> Result<String>
 	{
 		debug!("uri: {:?}\nbody: {:?}", &uri, &body);
-		let mut header = self.header.clone();
+		let mut header = self.header.clone(); // <- possible to remove clone()?
 		header.set(ContentType::json());
 		info!("{:?}", header);
 		let mut resp = self.client.post(&uri)
@@ -94,10 +94,10 @@ impl Dropbox
 	fn download(&self, uri: String, body: String)
 	-> Result<(String, Vec<u8>)>
 	{
-		let mut header = self.header.clone();
+		let mut header = self.header.clone(); // <- possible to remove clone()?
 		header!{ (DropboxApiArg, "Dropbox-API-Arg") => [String] };
 		header.set(DropboxApiArg(body.to_owned()));
-		debug!("header: {:?}\nuri: {:?}\nbody: {:?}", &header, &uri, &body);
+		debug!("header: {:?}\nbody: {:?}", &header, &body);
 		let mut resp = self.client.post(&uri)
 			.headers(header)
 			.send()?;
@@ -112,6 +112,10 @@ impl Dropbox
 			Some(r) => r,
 		};
 		trace!("{:?}", &file_info);
-		Ok((file_info, buffer))
+		// I don't like the way it's implemented now
+		// may be implement an function to save the output to a given Path
+		// or something else
+		// Ok((file_info, buffer))
+		Err(DropboxError::Other)
 	}
 }

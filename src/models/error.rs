@@ -247,5 +247,39 @@ pub enum LookupError
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct PathRootError
 {
-	path_root: Option<String>,
+	pub path_root: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum RestoreError
+{
+	#[serde(rename="path_lookup")]
+	PathLookup(LookupError),
+	#[serde(rename="path_write")]
+	PathWrite(WriteError),
+	#[serde(rename="invalid_revision")]
+	InvalidRevision,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum SaveUrlError
+{
+	#[serde(rename="path")]
+	Path(WriteError),
+	#[serde(rename="download_failed")]
+	DownloadFailed,
+	#[serde(rename="invalid_url")]
+	InvalidUrl,
+	#[serde(rename="not_found")]
+	NotFound,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum SearchError
+{
+	#[serde(rename="path")]
+	Path(LookupError),
 }
