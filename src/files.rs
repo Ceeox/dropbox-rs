@@ -564,23 +564,63 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn upload_session_finish()
+	pub fn upload_session_finish(&self, arg: UploadSessionCursor, file_path: &Path)
+	-> Result<FileMetadata>
 	{
-		unimplemented!();
+		let uri = gen_upload_uri!("files", "upload_session", "finish");
+		let arg: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.upload(&uri, &arg, file_path)?;
+		match serde_json::from_str::<FileMetadata>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<UploadSessionFinishError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::UploadSessionFinishError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn upload_session_finish_batch()
+	pub fn upload_session_finish_batch(&self, arg: UploadSessionFinishBatchArg)
+	-> Result<UploadSessionFinishBatchLaunch>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "upload_session", "finish_batch");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
+		match serde_json::from_str::<UploadSessionFinishBatchLaunch>(&resp)
+		{
+			Err(_) => Err(DropboxError::Other),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn upload_session_finish_batch_check()
+	pub fn upload_session_finish_batch_check(&self, arg: PollArg)
+	-> Result<UploadSessionFinishBatchJobStatus>
 	{
-		unimplemented!();
+		let uri = gen_upload_uri!("files", "upload_session", "finish_batch", "check");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
+		match serde_json::from_str::<UploadSessionFinishBatchJobStatus>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::PollError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn upload_session_start()
+	pub fn upload_session_start(&self, arg: UploadSessionStartArg, file_path: &Path)
+	-> Result<UploadSessionStartResult>
 	{
-		unimplemented!();
+		let uri = gen_upload_uri!("files", "upload_session", "start");
+		let arg: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.upload(&uri, &arg, file_path)?;
+		match serde_json::from_str::<UploadSessionStartResult>(&resp)
+		{
+			Err(_) => Err(DropboxError::Other),
+			Ok(r) => Ok(r),
+		}
 	}
 }

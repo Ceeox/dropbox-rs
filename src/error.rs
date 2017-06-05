@@ -39,6 +39,7 @@ pub enum DropboxError
 	SearchError(Error<SearchError>),
 	UploadError(Error<UploadError>),
 	UploadSessionLookupError(Error<UploadSessionLookupError>),
+	UploadSessionFinishError(Error<UploadSessionFinishError>),
 
 	Other,
 }
@@ -257,5 +258,14 @@ impl From<Error<UploadSessionLookupError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::UploadSessionLookupError(err)
+	}
+}
+
+impl From<Error<UploadSessionFinishError>> for DropboxError
+{
+	fn from(err: Error<UploadSessionFinishError>)
+	-> DropboxError
+	{
+		DropboxError::UploadSessionFinishError(err)
 	}
 }

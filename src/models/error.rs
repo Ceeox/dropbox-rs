@@ -317,3 +317,16 @@ pub struct UploadSessionOffsetError
 {
 	pub correct_offset: u64,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum UploadSessionFinishError
+{
+	#[serde(rename="lookup_failed")]
+	LookupFailed(UploadSessionLookupError),
+	#[serde(rename="path")]
+	Path(WriteError),
+	#[serde(rename="too_many_shared_folder_targets")]
+	TooManySharedFolderTargets,
+	#[serde(rename="too_many_write_operations")]
+	TooManyWriteOperations,
+}

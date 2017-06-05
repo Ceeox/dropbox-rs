@@ -559,3 +559,59 @@ pub struct UploadSessionCursor
 	pub session_id: String,
 	pub offset: u64,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadSessionFinishArg
+{
+	pub cursor: UploadSessionCursor,
+	pub commit: CommitInfo,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadSessionFinishBatchArg
+{
+	pub entries: Vec<UploadSessionFinishArg>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadSessionFinishBatchLaunch
+{
+	pub async_job_id: String,
+	pub complete: UploadSessionFinishBatchResult,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadSessionFinishBatchResult
+{
+	pub entries: Vec<UploadSessionFinishBatchResultEntry>
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum UploadSessionFinishBatchResultEntry
+{
+	#[serde(rename="success")]
+	Success(FileMetadata),
+	#[serde(rename="failure")]
+	Failure(UploadSessionFinishError),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum UploadSessionFinishBatchJobStatus
+{
+	#[serde(rename="in_progress")]
+	InProgress,
+	#[serde(rename="complete")]
+	Complete(UploadSessionFinishBatchResult),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadSessionStartArg
+{
+	pub close: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadSessionStartResult
+{
+	pub session_id: String,
+}
