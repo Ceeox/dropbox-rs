@@ -547,12 +547,12 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn upload_session_append(&self, arg: UploadSessionAppendArg)
+	pub fn upload_session_append(&self, arg: UploadSessionAppendArg, file_path: &Path)
 	-> Result<()>
 	{
 		let uri = gen_upload_uri!("files", "upload_session", "append_v2");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(&uri, &body)?;
+		let arg: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.upload(&uri, &arg, file_path)?;
 		match serde_json::from_str::<Error<UploadSessionLookupError>>(&resp)
 		{
 			Err(e) => match e.is_eof()
