@@ -48,9 +48,11 @@ use hyper::header::*;
 // intern uses
 use ::error::*;
 // consts or statics
-static BASE_URL: &'static str = "https://api.dropboxapi.com";
-static UPLOAD_URL: &'static str = "https://content.dropboxapi.com";
-static API_VERSION: &'static str = "/2";
+static BASE_URL: &str = "https://api.dropboxapi.com";
+static UPLOAD_URL: &str = "https://content.dropboxapi.com";
+static API_VERSION: &str = "/2";
+static USER_AGENT: &str = concat!("dropbox-rs (https://github.com/souryo/dropbox-rs, ",
+	env!("CARGO_PKG_VERSION"), ")");
 // etc
 pub struct Dropbox
 {
@@ -136,6 +138,7 @@ impl Dropbox
 	{
 		let mut header = Headers::new();
 		header.set(Authorization(Bearer { token: self.token.clone() }));
+		header.set(UserAgent(USER_AGENT.to_owned()));
 		header.set(ContentType::json());
 		header
 	}
@@ -146,6 +149,7 @@ impl Dropbox
 		header!{ (DropboxApiArg, "Dropbox-API-Arg") => [String] };
 		let mut header = Headers::new();
 		header.set(Authorization(Bearer { token: self.token.clone() }));
+		header.set(UserAgent(USER_AGENT.to_owned()));
 		header.set(DropboxApiArg(arg.to_owned()));
 		header
 	}
