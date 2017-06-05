@@ -1,11 +1,11 @@
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Error<T>
 {
 	error_summary: String,
 	error: T,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum AlphaGetMetadataError
 {
 	#[serde(rename="path")]
@@ -14,7 +14,7 @@ pub enum AlphaGetMetadataError
 	PropertiesError(LookUpPropertiesError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum RelocationError
 {
 	#[serde(rename="from_lookup")]
@@ -35,7 +35,7 @@ pub enum RelocationError
 	DuplicatedOrNestedPaths,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum WriteError
 {
 	#[serde(rename="malformed_path")]
@@ -52,7 +52,7 @@ pub enum WriteError
 	TeamFolder,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum WriteConflictError
 {
 	#[serde(rename="file")]
@@ -63,7 +63,7 @@ pub enum WriteConflictError
 	FileAncestor,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum RelocationBatchError
 {
 	#[serde(rename="from_lookup")]
@@ -84,7 +84,7 @@ pub enum RelocationBatchError
 	TooManyWriteOperations,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum PollError
 {
 	#[serde(rename="invalid_async_job_id")]
@@ -93,14 +93,14 @@ pub enum PollError
 	InternalError
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum GetCopyReferenceError
 {
 	#[serde(rename="path")]
 	Path{ path: LookupError},
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum SaveCopyReferenceError
 {
@@ -116,7 +116,7 @@ pub enum SaveCopyReferenceError
 	TooManyFiles,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum DownloadError
 {
@@ -124,7 +124,7 @@ pub enum DownloadError
 	Path(LookupError)
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum GetMetadataError
 {
@@ -132,7 +132,7 @@ pub enum GetMetadataError
 	Path(LookupError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum PreviewError
 {
@@ -146,7 +146,7 @@ pub enum PreviewError
 	UnsupportedContent,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum GetTemporaryLinkError
 {
@@ -154,7 +154,7 @@ pub enum GetTemporaryLinkError
 	Path(LookupError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum ThumbnailError
 {
@@ -167,7 +167,7 @@ pub enum ThumbnailError
 	ConversionError,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum ListFolderContinueError
 {
@@ -177,7 +177,7 @@ pub enum ListFolderContinueError
 	Reset,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum ListFolderLongpollError
 {
@@ -185,7 +185,7 @@ pub enum ListFolderLongpollError
 	Reset,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum ListRevisionsError
 {
@@ -193,7 +193,7 @@ pub enum ListRevisionsError
 	Path(LookupError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum CreateFolderError
 {
@@ -201,7 +201,7 @@ pub enum CreateFolderError
 	Path(WriteError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum DeleteError
 {
@@ -211,14 +211,14 @@ pub enum DeleteError
 	PathWrite(WriteError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum LookUpPropertiesError
 {
 	#[serde(rename="property_group_not_found")]
 	PropertyGroupNotFound,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum ListFolderError
 {
@@ -226,7 +226,7 @@ pub enum ListFolderError
 	Path{ path: LookupError},
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum LookupError
 {
@@ -244,13 +244,13 @@ pub enum LookupError
 	InvalidPathRoot(PathRootError)
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct PathRootError
 {
 	pub path_root: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum RestoreError
 {
@@ -262,7 +262,7 @@ pub enum RestoreError
 	InvalidRevision,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum SaveUrlError
 {
@@ -276,7 +276,7 @@ pub enum SaveUrlError
 	NotFound,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum SearchError
 {
@@ -284,7 +284,7 @@ pub enum SearchError
 	Path(LookupError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum UploadError
 {
@@ -292,14 +292,14 @@ pub enum UploadError
 	Path(UploadWriteFailed),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct UploadWriteFailed
 {
 	pub reason: WriteError,
 	pub upload_session_id: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum UploadSessionLookupError
 {
 	#[serde(rename="not_found")]
@@ -312,13 +312,13 @@ pub enum UploadSessionLookupError
 	NotClosed,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct UploadSessionOffsetError
 {
 	pub correct_offset: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum UploadSessionFinishError
 {
 	#[serde(rename="lookup_failed")]
