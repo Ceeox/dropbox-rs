@@ -16,6 +16,7 @@ pub enum DropboxError
 	Utf8Error(FromUtf8Error),
 	IoError(StdIoError),
 	JsonError(SerdeJsonError),
+	MissingDropboxApiResult,
 
 	// Dropbox api errors
 	RelocationError(Error<RelocationError>),

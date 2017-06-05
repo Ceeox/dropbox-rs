@@ -27,6 +27,7 @@
 extern crate serde_json;
 #[macro_use] extern crate hyper;
 extern crate hyper_native_tls;
+#[macro_use] extern crate mime;
 // extern mods
 // intern mods
 #[cfg(test)] mod tests;
@@ -35,7 +36,10 @@ pub mod error;
 #[macro_use] mod macros;
 pub mod files;
 // std uses
+use std::fs::File;
 use std::io::Read;
+use std::io::Write;
+use std::path::Path;
 // crate uses
 use hyper::Client;
 use hyper::net::HttpsConnector;
@@ -51,7 +55,7 @@ static API_VERSION: &'static str = "/2";
 pub struct Dropbox
 {
 	client: hyper::Client,
-	header: hyper::header::Headers,
+	token: String,
 }
 
 impl Dropbox
@@ -59,9 +63,6 @@ impl Dropbox
 	pub fn new(token: String)
 	-> Result<Self>
 	{
-		let mut h = Headers::new();
-		h.set(Authorization(Bearer { token: token }));
-
 		let ssl = NativeTlsClient::new().unwrap();
 		let connector = HttpsConnector::new(ssl);
 		let client = Client::with_connector(connector);
@@ -69,53 +70,83 @@ impl Dropbox
 		Ok(Dropbox
 		{
 			client: client,
-			header: h,
+			token: token,
 		})
 	}
 
-	fn send_request(&self, uri: String, body: String)
+	fn send_request(&self, uri: &str, body: &str)
 	-> Result<String>
 	{
-		debug!("uri: {:?}\nbody: {:?}", &uri, &body);
-		let mut header = self.header.clone(); // <- possible to remove clone()?
-		header.set(ContentType::json());
-		info!("{:?}", header);
-		let mut resp = self.client.post(&uri)
+		let header = self.create_headers();
+		debug!("{:?}", &header);
+		let mut resp = self.client.post(uri)
 			.headers(header)
-			.body(&body)
+			.body(body)
 			.send()?;
-		trace!("{:?}", &resp);
 		let mut body = String::new();
 		resp.read_to_string(&mut body)?;
 		trace!("{:?}", &body);
 		Ok(body)
 	}
 
-	fn download(&self, uri: String, body: String)
-	-> Result<(String, Vec<u8>)>
+	fn download(&self, uri: &str, arg: &str, file_path: &Path)
+	-> Result<String>
 	{
-		let mut header = self.header.clone(); // <- possible to remove clone()?
-		header!{ (DropboxApiArg, "Dropbox-API-Arg") => [String] };
-		header.set(DropboxApiArg(body.to_owned()));
-		debug!("header: {:?}\nbody: {:?}", &header, &body);
-		let mut resp = self.client.post(&uri)
+		let header = self.create_content_headers(&arg);
+		debug!("{:?}", &header);
+		let mut resp = self.client.post(uri)
 			.headers(header)
 			.send()?;
-		trace!("{:?}", &resp);
-		let mut buffer = Vec::new();
-		resp.read_to_end(&mut buffer)?;
-		let file_info = match resp.headers.iter()
+		let api_resp = match resp.headers.iter()
 			.find(|i| i.name() == "dropbox-api-result")
 			.map(|i| i.value_string())
 		{
-			None => return Err(DropboxError::Other),
+			None => return Err(DropboxError::MissingDropboxApiResult),
 			Some(r) => r,
 		};
-		trace!("{:?}", &file_info);
-		// I don't like the way it's implemented now
-		// may be implement an function to save the output to a given Path
-		// or something else
-		// Ok((file_info, buffer))
-		Err(DropboxError::Other)
+		trace!("{:?}", &api_resp);
+		let mut buffer = vec![];
+		resp.read_to_end(&mut buffer)?;
+		let mut file = File::create(file_path)?;
+		file.write_all(&buffer)?;
+		Ok(api_resp)
+	}
+
+	fn upload(&self, uri: &str, arg: &str, file_path: &Path)
+	-> Result<String>
+	{
+		let mut file = File::open(file_path)?;
+		let mut contents = String::new();
+		file.read_to_string(&mut contents)?;
+		let mut header = self.create_content_headers(&arg);
+		header.set(ContentType(mime!(Application/OctetStream)));
+		debug!("{:?}", &header);
+		let mut resp = self.client.post(uri)
+			.headers(header)
+			.body(&contents)
+			.send()?;
+		let mut body = String::new();
+		resp.read_to_string(&mut body)?;
+		trace!("{:?}", &body);
+		Ok(body)
+	}
+
+	fn create_headers(&self)
+	-> Headers
+	{
+		let mut header = Headers::new();
+		header.set(Authorization(Bearer { token: self.token.clone() }));
+		header.set(ContentType::json());
+		header
+	}
+
+	fn create_content_headers(&self, arg: &str)
+	-> Headers
+	{
+		header!{ (DropboxApiArg, "Dropbox-API-Arg") => [String] };
+		let mut header = Headers::new();
+		header.set(Authorization(Bearer { token: self.token.clone() }));
+		header.set(DropboxApiArg(arg.to_owned()));
+		header
 	}
 }

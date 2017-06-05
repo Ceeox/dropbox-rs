@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use serde_json;
 
 use ::error::*;
@@ -40,7 +42,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<Metadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<RelocationError>>(&resp)
@@ -57,7 +59,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy_batch");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<RelocationBatchLaunch>(&resp)
 		{
 			Err(_) => Err(DropboxError::Other),
@@ -70,7 +72,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<RelocationBatchJobStatus>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
@@ -87,7 +89,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy_reference", "get");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<GetCopyReferenceResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<GetCopyReferenceError>>(&resp)
@@ -104,7 +106,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "copy_reference", "save");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<SaveCopyReferenceResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<SaveCopyReferenceError>>(&resp)
@@ -121,7 +123,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "create_folder");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<FolderMetadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<CreateFolderError>>(&resp)
@@ -138,7 +140,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "delete");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<Metadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<DeleteError>>(&resp)
@@ -155,7 +157,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "delete_batch");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<DeleteBatchLaunch>(&resp)
 		{
 			Err(_) => Err(DropboxError::Other),
@@ -168,7 +170,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "delete_batch", "check");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<DeleteBatchJobStatus>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
@@ -180,12 +182,12 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn download(&self, arg: DownloadArg)
-	-> Result<(FileMetadata, Vec<u8>)>
+	pub fn download(&self, arg: DownloadArg, file_path: &Path)
+	-> Result<FileMetadata>
 	{
 		let uri = gen_upload_uri!("files", "download");
 		let body: String = serde_json::to_string(&arg)?;
-		let (file_info, file) = self.dropbox.download(uri, body)?;
+		let file_info = self.dropbox.download(&uri, &body, &file_path)?;
 		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
 		{
 			Err(_) => return Err(match serde_json::from_str::<Error<DownloadError>>(&file_info)
@@ -195,7 +197,7 @@ impl<'a> DropboxFiles<'a>
 			}),
 			Ok(r) => r,
 		};
-		Ok((file_info, file))
+		Ok(file_info)
 	}
 
 	pub fn get_metadata(&self, arg: GetMetadataArg)
@@ -203,7 +205,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "get_metadata");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<Metadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<GetMetadataError>>(&resp)
@@ -215,12 +217,12 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn get_preview(&self, arg:  PreviewArg)
-	-> Result<(FileMetadata, Vec<u8>)>
+	pub fn get_preview(&self, arg:  PreviewArg, file_path: &Path)
+	-> Result<FileMetadata>
 	{
 		let uri = gen_upload_uri!("files", "get_preview");
 		let body: String = serde_json::to_string(&arg)?;
-		let (file_info, file) = self.dropbox.download(uri, body)?;
+		let file_info = self.dropbox.download(&uri, &body, file_path)?;
 		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
 		{
 			Err(_) => return Err(match serde_json::from_str::<Error<PreviewError>>(&file_info)
@@ -230,7 +232,7 @@ impl<'a> DropboxFiles<'a>
 			}),
 			Ok(r) => r,
 		};
-		Ok((file_info, file))
+		Ok(file_info)
 	}
 
 	pub fn get_temporary_link(&self, arg: GetTemporaryLinkArg)
@@ -238,7 +240,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "get_temporary_link");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<GetTemporaryLinkResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<GetTemporaryLinkError>>(&resp)
@@ -250,12 +252,12 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn get_thumbnail(&self, arg: ThumbnailArg)
-	-> Result<(FileMetadata, Vec<u8>)>
+	pub fn get_thumbnail(&self, arg: ThumbnailArg, file_path: &Path)
+	-> Result<FileMetadata>
 	{
 		let uri = gen_upload_uri!("files", "get_thumbnail");
 		let body: String = serde_json::to_string(&arg)?;
-		let (file_info, file) = self.dropbox.download(uri, body)?;
+		let file_info = self.dropbox.download(&uri, &body, file_path)?;
 		let file_info: FileMetadata = match serde_json::from_str::<FileMetadata>(&file_info)
 		{
 			Err(_) => return Err(match serde_json::from_str::<Error<ThumbnailError>>(&file_info)
@@ -265,7 +267,7 @@ impl<'a> DropboxFiles<'a>
 			}),
 			Ok(r) => r,
 		};
-		Ok((file_info, file))
+		Ok(file_info)
 	}
 
 	pub fn list_folder(&self, arg: ListFolderArg)
@@ -273,7 +275,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "list_folder");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<ListFolderResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<ListFolderError>>(&resp)
@@ -290,7 +292,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "list_folders", "continue");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<ListFolderResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<ListFolderContinueError>>(&resp)
@@ -307,7 +309,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "list_folders", "get_latest_cursor");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<ListFolderGetLatestCursorResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<ListFolderError>>(&resp)
@@ -324,7 +326,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "list_folders", "longpoll");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<ListFolderLongpollResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<ListFolderLongpollError>>(&resp)
@@ -341,7 +343,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "list_revisions");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<ListRevisionsResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<ListRevisionsError>>(&resp)
@@ -359,7 +361,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "move");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<Metadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<RelocationError>>(&resp)
@@ -376,7 +378,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "move_batch");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<RelocationBatchLaunch>(&resp)
 		{
 			Err(_) => Err(DropboxError::Other),
@@ -389,7 +391,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "move_batch", "check");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<RelocationBatchJobStatus>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
@@ -406,7 +408,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "permanetly_delete");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<Error<DeleteError>>(&resp)
 		{
 			Err(e) => match e.is_eof()
@@ -465,7 +467,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "restore");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<FileMetadata>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<RestoreError>>(&resp)
@@ -482,7 +484,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "save_url");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<SaveUrlResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<SaveUrlError>>(&resp)
@@ -499,7 +501,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "save_url", "check_job_status");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<SaveUrlJobStatus>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp)
@@ -516,7 +518,7 @@ impl<'a> DropboxFiles<'a>
 	{
 		let uri = gen_uri!("files", "search");
 		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.dropbox.send_request(uri, body)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
 		match serde_json::from_str::<SearchResult>(&resp)
 		{
 			Err(_) => Err(match serde_json::from_str::<Error<SearchError>>(&resp)
