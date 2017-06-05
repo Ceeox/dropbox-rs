@@ -7,7 +7,7 @@ pub struct AlphaGetMetadataArg
 }
 
 // /files/copy
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct RelocationArg
 {
 	pub from_path: String,
@@ -17,7 +17,7 @@ pub struct RelocationArg
 }
 
 // /files/copy_batch
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct RelocationBatchArg
 {
 	pub entries: Vec<RelocationPath>,
@@ -25,40 +25,40 @@ pub struct RelocationBatchArg
 	pub autorename: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct RelocationPath
 {
 	pub from_path: String,
 	pub to_path: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct RelocationBatchLaunch
 {
 	pub async_job_id: String,
 	pub complete: RelocationBatchResult,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct RelocationBatchResult
 {
 	pub entries: Vec<RelocationResult>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct RelocationResult
 {
 	pub metadata: Metadata,
 }
 
 // /files/copy_batch/check
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct PollArg
 {
 	pub async_job_id: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum RelocationBatchJobStatus
 {
 	#[serde(rename="in_progress")]
@@ -70,13 +70,13 @@ pub enum RelocationBatchJobStatus
 }
 
 // /files/copy_reference/get
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct GetCopyReferenceArg
 {
 	pub path: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct GetCopyReferenceResult
 {
 	pub metadata: Metadata,
@@ -85,21 +85,21 @@ pub struct GetCopyReferenceResult
 }
 
 // /files/copy_reference/save
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct SaveCopyReferenceArg
 {
 	pub copy_reference: String,
 	pub path: String
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SaveCopyReferenceResult
 {
 	pub metadata: Metadata,
 }
 
 // /files/create_folder
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct CreateFolderArg
 {
 	pub path: String,
@@ -107,20 +107,20 @@ pub struct CreateFolderArg
 }
 
 // /files/delete
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct DeleteArg
 {
 	pub path: String,
 }
 
 // /files/delete_batch
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct DeleteBatchArg
 {
 	pub entries: Vec<DeleteArg>
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum DeleteBatchLaunch
 {
@@ -130,13 +130,13 @@ pub enum DeleteBatchLaunch
 	Complete(DeleteBatchResult),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct DeleteBatchResult
 {
 	pub entries: Vec<DeleteBatchResultEntry>
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum DeleteBatchResultEntry
 {
 	#[serde(rename="success")]
@@ -145,14 +145,14 @@ pub enum DeleteBatchResultEntry
 	Failure(DeleteError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct DeleteResult
 {
 	pub metadata: Metadata,
 }
 
 // /files/delete_batch/check
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum DeleteBatchJobStatus
 {
@@ -164,7 +164,7 @@ pub enum DeleteBatchJobStatus
 	Failed(DeleteBatchError)
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum DeleteBatchError
 {
 	#[serde(rename="too_many_write_operations")]
@@ -172,14 +172,14 @@ pub enum DeleteBatchError
 }
 
 // /files/download
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct DownloadArg
 {
 	pub path: String,
 }
 
 // /files/get_metadata
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct GetMetadataArg
 {
 	pub path: String,
@@ -189,20 +189,20 @@ pub struct GetMetadataArg
 }
 
 // /files/get_preview
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct PreviewArg
 {
 	pub path: String,
 }
 
 // /files/get_temporary_link
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct GetTemporaryLinkArg
 {
 	pub path: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct GetTemporaryLinkResult
 {
 	pub metadata: Metadata,
@@ -210,7 +210,7 @@ pub struct GetTemporaryLinkResult
 }
 
 // files/get_thumbnail
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct ThumbnailArg
 {
 	pub path: String,
@@ -218,7 +218,7 @@ pub struct ThumbnailArg
 	pub size: ThumbnailSize,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub enum ThumbnailFormat
 {
 	#[serde(rename="png")]
@@ -227,7 +227,7 @@ pub enum ThumbnailFormat
 	Jpeg,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub enum ThumbnailSize
 {
 	#[serde(rename="w32h32")]
@@ -243,28 +243,28 @@ pub enum ThumbnailSize
 }
 
 // /flies/list_folders/continue
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderContinueArg
 {
 	pub cursor: String,
 }
 
 // /files/list_folder/get_latest_cursor
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderGetLatestCursorResult
 {
 	pub cursor: String,
 }
 
 // /files/list_folder/longpoll
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderLongpollArg
 {
 	pub cursor: String,
 	pub timeout: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderLongpollResult
 {
 	pub changes: bool,
@@ -272,14 +272,14 @@ pub struct ListFolderLongpollResult
 }
 
 // /files/list_revisions
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct ListRevisionsArg
 {
 	pub path: String,
 	pub limit: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListRevisionsResult
 {
 	pub is_deleted: bool,
@@ -287,7 +287,7 @@ pub struct ListRevisionsResult
 }
 
 // /files/get_account
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderArg
 {
 	pub path: String,
@@ -297,7 +297,7 @@ pub struct ListFolderArg
 	pub include_has_explicit_shared_members: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct ListFolderResult
 {
 	pub entries: Vec<Metadata>,
@@ -305,7 +305,7 @@ pub struct ListFolderResult
 	pub has_more: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag=".tag")]
 pub enum Metadata
 {
@@ -317,7 +317,7 @@ pub enum Metadata
 	Deleted(DeletedMetadata),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct FileMetadata
 {
 	pub name: String,
@@ -336,7 +336,7 @@ pub struct FileMetadata
 	pub content_hash: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum MediaInfo
 {
 	#[serde(rename="pending")]
@@ -345,14 +345,14 @@ pub enum MediaInfo
 	Metadata(MediaMetadata),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct MediaMetadata
 {
 	pub photo: PhotoMetadata,
 	pub video: VideoMetadata,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct PhotoMetadata
 {
 	pub dimensions: Option<Dimensions>,
@@ -360,21 +360,21 @@ pub struct PhotoMetadata
 	pub time_taken: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct Dimensions
 {
 	pub height: u64,
 	pub width: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct GpsCoordinates
 {
 	pub latitude: f64,
 	pub longitude: f64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct VideoMetadata
 {
 	pub dimensions: Option<Dimensions>,
@@ -458,7 +458,7 @@ pub struct SaveUrlArg
 	pub url: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum SaveUrlResult
 {
 	#[serde(rename="async_job_id")]
@@ -467,7 +467,7 @@ pub enum SaveUrlResult
 	Complete(FileMetadata),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum SaveUrlJobStatus
 {
 	#[serde(rename="in_progress")]
@@ -499,7 +499,7 @@ pub enum SearchMode
 	DeletedFilename,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SearchResult
 {
 	pub matches: Vec<SearchMatch>,
@@ -507,14 +507,14 @@ pub struct SearchResult
 	pub start: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct SearchMatch
 {
 	pub match_type: SearchMatchType,
 	pub metadata: Metadata,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum SearchMatchType
 {
 	#[serde(rename="filename")]
@@ -525,7 +525,7 @@ pub enum SearchMatchType
 	Both,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct CommitInfo
 {
 	pub path: String,
@@ -535,7 +535,7 @@ pub struct CommitInfo
 	pub mute: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub enum WriteMode
 {
 	#[serde(rename="add")]
@@ -546,47 +546,47 @@ pub enum WriteMode
 	Update(String),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct UploadSessionAppendArg
 {
 	pub cursor: UploadSessionCursor,
 	pub close: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Serialize, Debug, Clone, Default, PartialEq)]
 pub struct UploadSessionCursor
 {
 	pub session_id: String,
 	pub offset: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct UploadSessionFinishArg
 {
 	pub cursor: UploadSessionCursor,
 	pub commit: CommitInfo,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct UploadSessionFinishBatchArg
 {
 	pub entries: Vec<UploadSessionFinishArg>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct UploadSessionFinishBatchLaunch
 {
 	pub async_job_id: String,
 	pub complete: UploadSessionFinishBatchResult,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct UploadSessionFinishBatchResult
 {
 	pub entries: Vec<UploadSessionFinishBatchResultEntry>
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum UploadSessionFinishBatchResultEntry
 {
 	#[serde(rename="success")]
@@ -595,7 +595,7 @@ pub enum UploadSessionFinishBatchResultEntry
 	Failure(UploadSessionFinishError),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub enum UploadSessionFinishBatchJobStatus
 {
 	#[serde(rename="in_progress")]
@@ -604,13 +604,13 @@ pub enum UploadSessionFinishBatchJobStatus
 	Complete(UploadSessionFinishBatchResult),
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub struct UploadSessionStartArg
 {
 	pub close: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct UploadSessionStartResult
 {
 	pub session_id: String,
