@@ -530,19 +530,38 @@ impl<'a> DropboxFiles<'a>
 		}
 	}
 
-	pub fn upload()
+	pub fn upload(&self, arg: CommitInfo, file_path: &Path)
+	-> Result<FileMetadata>
 	{
-		unimplemented!();
+		let uri = gen_uri!("files", "upload");
+		let arg: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.upload(&uri, &arg, file_path)?;
+		match serde_json::from_str::<FileMetadata>(&resp)
+		{
+			Err(_) => Err(match serde_json::from_str::<Error<UploadError>>(&resp)
+			{
+				Err(_) => DropboxError::Other,
+				Ok(r) => DropboxError::UploadError(r),
+			}),
+			Ok(r) => Ok(r),
+		}
 	}
 
-	pub fn upload_session_append()
+	pub fn upload_session_append(&self, arg: UploadSessionAppendArg)
+	-> Result<()>
 	{
-		unimplemented!();
-	}
-
-	pub fn upload_session_apped_v2()
-	{
-		unimplemented!();
+		let uri = gen_upload_uri!("files", "upload_session", "append_v2");
+		let body: String = serde_json::to_string(&arg)?;
+		let resp: String = self.dropbox.send_request(&uri, &body)?;
+		match serde_json::from_str::<Error<UploadSessionLookupError>>(&resp)
+		{
+			Err(e) => match e.is_eof()
+			{
+				false => Err(DropboxError::Other),
+				true => Ok(()),
+			},
+			Ok(r) => Err(DropboxError::UploadSessionLookupError(r)),
+		}
 	}
 
 	pub fn upload_session_finish()

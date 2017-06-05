@@ -37,6 +37,8 @@ pub enum DropboxError
 	RestoreError(Error<RestoreError>),
 	SaveUrlError(Error<SaveUrlError>),
 	SearchError(Error<SearchError>),
+	UploadError(Error<UploadError>),
+	UploadSessionLookupError(Error<UploadSessionLookupError>),
 
 	Other,
 }
@@ -236,5 +238,24 @@ impl From<Error<SearchError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::SearchError(err)
+	}
+}
+
+
+impl From<Error<UploadError>> for DropboxError
+{
+	fn from(err: Error<UploadError>)
+	-> DropboxError
+	{
+		DropboxError::UploadError(err)
+	}
+}
+
+impl From<Error<UploadSessionLookupError>> for DropboxError
+{
+	fn from(err: Error<UploadSessionLookupError>)
+	-> DropboxError
+	{
+		DropboxError::UploadSessionLookupError(err)
 	}
 }

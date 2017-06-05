@@ -283,3 +283,37 @@ pub enum SearchError
 	#[serde(rename="path")]
 	Path(LookupError),
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum UploadError
+{
+	#[serde(rename="path")]
+	Path(UploadWriteFailed),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadWriteFailed
+{
+	pub reason: WriteError,
+	pub upload_session_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum UploadSessionLookupError
+{
+	#[serde(rename="not_found")]
+	NotFound,
+	#[serde(rename="incorrect_offset")]
+	IncorrectOffset(UploadSessionOffsetError),
+	#[serde(rename="closed")]
+	Closed,
+	#[serde(rename="not_closed")]
+	NotClosed,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct UploadSessionOffsetError
+{
+	pub correct_offset: u64,
+}

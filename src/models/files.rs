@@ -524,3 +524,38 @@ pub enum SearchMatchType
 	#[serde(rename="both")]
 	Both,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct CommitInfo
+{
+	pub path: String,
+	pub mode: WriteMode,
+	pub autorename: bool,
+	pub client_modified: String,
+	pub mute: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum WriteMode
+{
+	#[serde(rename="add")]
+	Add,
+	#[serde(rename="overwrite")]
+	Overwrite,
+	#[serde(rename="update")]
+	Update(String),
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct UploadSessionAppendArg
+{
+	pub cursor: UploadSessionCursor,
+	pub close: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct UploadSessionCursor
+{
+	pub session_id: String,
+	pub offset: u64,
+}
