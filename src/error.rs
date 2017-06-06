@@ -40,6 +40,8 @@ pub enum DropboxError
 	UploadError(Error<UploadError>),
 	UploadSessionLookupError(Error<UploadSessionLookupError>),
 	UploadSessionFinishError(Error<UploadSessionFinishError>),
+	GetAccountError(Error<GetAccountError>),
+	GetAccountBatchError(Error<GetAccountBatchError>),
 
 	Other,
 }
@@ -267,5 +269,23 @@ impl From<Error<UploadSessionFinishError>> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::UploadSessionFinishError(err)
+	}
+}
+
+impl From<Error<GetAccountError>> for DropboxError
+{
+	fn from(err: Error<GetAccountError>)
+	-> DropboxError
+	{
+		DropboxError::GetAccountError(err)
+	}
+}
+
+impl From<Error<GetAccountBatchError>> for DropboxError
+{
+	fn from(err: Error<GetAccountBatchError>)
+	-> DropboxError
+	{
+		DropboxError::GetAccountBatchError(err)
 	}
 }

@@ -35,6 +35,7 @@ pub mod models;
 pub mod error;
 #[macro_use] mod macros;
 pub mod files;
+pub mod users;
 // std uses
 use std::fs::File;
 use std::io::Read;
@@ -54,6 +55,7 @@ static API_VERSION: &str = "/2";
 static USER_AGENT: &str = concat!("dropbox-rs (https://github.com/souryo/dropbox-rs, ",
 	env!("CARGO_PKG_VERSION"), ")");
 // etc
+
 pub struct Dropbox
 {
 	client: hyper::Client,
@@ -81,10 +83,19 @@ impl Dropbox
 	{
 		let header = self.create_headers();
 		debug!("{:?}", &header);
-		let mut resp = self.client.post(uri)
-			.headers(header)
-			.body(body)
-			.send()?;
+		let mut resp = if !body.is_empty()
+		{
+			self.client.post(uri)
+				.headers(header)
+				.body(body)
+				.send()?
+		}
+		else
+		{
+			self.client.post(uri)
+				.headers(header)
+				.send()?
+		};
 		let mut body = String::new();
 		resp.read_to_string(&mut body)?;
 		trace!("{:?}", &body);

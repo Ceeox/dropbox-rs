@@ -410,3 +410,19 @@ pub enum UploadSessionFinishError
 	#[serde(rename="too_many_write_operations")]
 	TooManyWriteOperations,
 }
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum GetAccountError
+{
+	#[serde(rename="no_account")]
+	NoAccount,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag=".tag")]
+pub enum GetAccountBatchError
+{
+	#[serde(rename="no_account")]
+	NoAccount(String),
+}
