@@ -1,4 +1,6 @@
 # dropbox-rs
+This library is unofficial!
+
 This library is under development, expect api breaks!
 
 ## TODO
