@@ -2,7 +2,7 @@
 This library is under development, expect api breaks!
 
 ## TODO
-- [ ] Better Options to download files/previews
+- [X] Better Options to download/upload files/previews
 - [ ] Examples and documentation
 - [ ] Maybe some error descriptions.
 - [ ] Implement all Dropbox-Api Calls
