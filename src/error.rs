@@ -4,6 +4,7 @@ use std::io::Error as StdIoError;
 // extern uses
 use hyper::error::Error as HyperErr;
 use serde_json::Error as SerdeJsonError;
+use hyper_native_tls::native_tls::Error as TlsError;
 // intern uses
 use ::models::error::*;
 
@@ -17,6 +18,7 @@ pub enum DropboxError
 	IoError(StdIoError),
 	JsonError(SerdeJsonError),
 	MissingDropboxApiResult,
+	ServerError(TlsError),
 
 	// Dropbox api errors
 	RelocationError(Error<RelocationError>),
@@ -79,6 +81,15 @@ impl From<SerdeJsonError> for DropboxError
 	-> DropboxError
 	{
 		DropboxError::JsonError(err)
+	}
+}
+
+impl From<TlsError> for DropboxError
+{
+	fn from(err: TlsError)
+	-> DropboxError
+	{
+		DropboxError::ServerError(err)
 	}
 }
 

@@ -13,12 +13,12 @@ pub struct DropboxUsers<'a>
 impl<'a> DropboxUsers<'a>
 {
 	pub fn new(dropbox: &'a Dropbox)
-	-> Result<DropboxUsers<'a>>
+	-> DropboxUsers<'a>
 	{
-		Ok(DropboxUsers
+		DropboxUsers
 		{
 			dropbox: dropbox,
-		})
+		}
 	}
 
 	/// Get information about a user's account.

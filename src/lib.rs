@@ -65,9 +65,9 @@ pub struct Dropbox
 impl Dropbox
 {
 	pub fn new(token: String)
-	-> Result<Self>
+	-> Result<Dropbox>
 	{
-		let ssl = NativeTlsClient::new().unwrap();
+		let ssl = NativeTlsClient::new()?;
 		let connector = HttpsConnector::new(ssl);
 		let client = Client::with_connector(connector);
 

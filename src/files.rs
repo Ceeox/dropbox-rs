@@ -15,12 +15,12 @@ pub struct DropboxFiles<'a>
 impl<'a> DropboxFiles<'a>
 {
 	pub fn new(dropbox: &'a Dropbox)
-	-> Result<DropboxFiles<'a>>
+	-> DropboxFiles<'a>
 	{
-		Ok(DropboxFiles
+		DropboxFiles
 		{
 			dropbox: dropbox,
-		})
+		}
 	}
 
 	/// PREVIEW - may change or disappear without notice
