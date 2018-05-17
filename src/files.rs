@@ -86,7 +86,7 @@ impl<'a> DropboxFiles<'a>
 	}
 
 	/// Returns the status of an asynchronous job for copy_batch.
-	///If success, it returns list of results for each entry.
+	/// If success, it returns list of results for each entry.
 	pub fn copy_batch_check(&self, arg: PollArg)
 	-> Result<RelocationBatchJobStatus>
 	{
