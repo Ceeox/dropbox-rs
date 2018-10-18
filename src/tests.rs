@@ -1,18 +1,15 @@
 #[cfg(test)]
-mod tests
-{
+mod tests {
+	use std::fs::File;
 	use std::io;
 	use std::io::prelude::*;
-	use std::fs::File;
 
+	use models::files::*;
 	use serde_json;
-	use ::models::files::*;
 
 	#[test]
-	fn files_list_folder_arg()
-	{
-		let arg = ListFolderArg
-		{
+	fn files_list_folder_arg() {
+		let arg = ListFolderArg {
 			path: "/Homework/math".to_string(),
 			recursive: false,
 			include_media_info: false,
@@ -26,10 +23,8 @@ mod tests
 
 	// TODO
 	#[test]
-	fn files_list_folder_ret()
-	{
-		let arg = ListFolderResult
-		{
+	fn files_list_folder_ret() {
+		let arg = ListFolderResult {
 			entries: vec![
 				File(FileMetadata {
 					name: "Prime_Numbers.txt".to_string(),
@@ -75,7 +70,7 @@ mod tests
 					}]
 				})],
 			cursor: "ZtkX9_EHj3x7PMkVuFIhwKYXEpwpLwyxp9vMKomUhllil9q7eWiAu".to_string(),
-			has_more: false
+			has_more: false,
 		};
 		let mut file = File::open("tests_json/files/list_folder_arg.json").unwrap();
 		let file: ListFolderArg = serde_json::from_reader(file).unwrap();
