@@ -23,13 +23,13 @@
  */
 
 // extern crates
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate serde_derive;
 extern crate hyper;
 extern crate hyper_tls;
+#[macro_use]
+extern crate log;
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
 
 // intern mods
@@ -47,10 +47,10 @@ pub mod users;
 use std::path::Path;
 use std::sync::Arc;
 // crate uses
-use hyper::body::Body;
 use hyper::client::HttpConnector;
+use hyper::http::request::Builder;
 use hyper::rt::{Future, Stream};
-use hyper::{Client, Method, Request};
+use hyper::{Body, Chunk, Client, Method, Request, Uri};
 use hyper_tls::HttpsConnector;
 use serde::{Deserialize, Serialize};
 
@@ -77,61 +77,64 @@ pub struct DropboxContext {
 impl DropboxContext {
 	/// Creates a context this holds the http client and the token
 	pub fn new(token: &str) -> Result<Self> {
-		let https = HttpsConnector::new(2)?;
-		let client = Client::builder().build(https);
+		let https = HttpsConnector::new(4)?;
+		let client = Client::builder().keep_alive(false).build(https);
 		let token = Arc::new(token.to_owned());
 		Ok(DropboxContext { client, token })
 	}
 
+	fn create_request(&self, uri: Uri, method: Method, body: Option<Vec<u8>>) -> Request<Body> {
+		let mut request = Request::builder();
+		request
+			.uri(uri)
+			.method(method)
+			.header("User-Agent", USER_AGENT)
+			.header("Authorization", format!("Bearer {}", self.token.clone()));
+
+		match body {
+			Some(r) => request
+				.header("Content-Type", "application/json")
+				.body(Body::from(r))
+				.unwrap(),
+			None => request.body(Body::empty()).unwrap(),
+		}
+	}
+
+	#[inline]
 	pub(crate) fn client(&self) -> &Client<HttpsConnector<HttpConnector>, Body> {
 		&self.client
 	}
 
-	pub(crate) fn chnage_token(&mut self, new_token: &str) {
-		self.token = Arc::new(new_token.to_owned());
+	#[inline]
+	pub(crate) fn change_token(&mut self, new_token: String) {
+		self.token = Arc::new(new_token);
 	}
 
-	fn send_request<'de, I: Serialize, T: Deserialize<'de>, E: Deserialize<'de>>(
+	fn request(
 		&self,
-		uri: &str,
-		body: String,
-	) -> Result<impl Future<Item = T, Error = DropboxError>>
-	where
-		error::DropboxError: std::convert::From<models::error::Error<E>>,
-	{
-		let request = Request::builder()
-			.uri(uri)
-			.method(Method::POST)
-			.header("User-Agent", "application/json")
-			.header("Authorization", format!("Bearer {}", &*self.token.clone()))
-			.body(Body::from(body))
-			.unwrap();
-
+		request: Request<Body>,
+	) -> impl Future<Item = hyper::Chunk, Error = DropboxError> {
 		self.client
 			.request(request)
 			.and_then(|res| res.into_body().concat2())
 			.from_err::<DropboxError>()
-			.and_then(|body| match serde_json::from_slice::<T>(body) {
-				Err(e1) => {
-					error!("Error in prasing the json response: {}", e1);
-					Err(match serde_json::from_slice::<Error<E>>(body) {
-						Err(e2) => {
-							error!("Error in prasing the json error response: {}", e2);
-							DropboxError::Other
-						}
-						Ok(r) => DropboxError::from(r),
-					})
-				}
-				Ok(r) => Ok(r),
-			})
 	}
 
 	fn download(&self, uri: &str, arg: &str, file_path: &Path) -> Result<String> {
-		Err(DropboxError::Other)
+		Err(DropboxError::Other(String::from("Not Implemented")))
 	}
 
 	fn upload(&self, uri: &str, arg: &str, file_path: &Path) -> Result<String> {
-		Err(DropboxError::Other)
+		/*
+		let request = Request::builder()
+			.uri(uri)
+			.method(Method::POST)
+			.header("User-Agent", "application/json")
+			.header("Authorization", format!("Bearer {}", self.token.clone()))
+			.body(Body::from(body))
+			.unwrap();
+		*/
+		Err(DropboxError::Other(String::from("Not Implemented")))
 	}
 }
 
@@ -144,6 +147,7 @@ impl Clone for DropboxContext {
 	}
 }
 
+#[derive(Clone)]
 pub struct Dropbox {
 	context: DropboxContext,
 	//pub files: DropboxFiles,
@@ -161,28 +165,9 @@ impl Dropbox {
 			users,
 		})
 	}
-}
-/*
-impl Dropbox {
-	fn create_headers(&self) -> Headers {
-		let mut header = Headers::new();
-		header.set(Authorization(Bearer {
-			token: self.token.clone(),
-		}));
-		header.set(UserAgent(USER_AGENT.to_owned()));
-		header.set(ContentType::json());
-		header
-	}
 
-	fn create_content_headers(&self, arg: &str) -> Headers {
-		header!{ (DropboxApiArg, "Dropbox-API-Arg") => [String] };
-		let mut header = Headers::new();
-		header.set(Authorization(Bearer {
-			token: self.token.clone(),
-		}));
-		header.set(UserAgent(USER_AGENT.to_owned()));
-		header.set(DropboxApiArg(arg.to_owned()));
-		header
+	#[inline]
+	pub fn change_token(&mut self, new_token: String) {
+		self.context.change_token(new_token)
 	}
 }
-*/

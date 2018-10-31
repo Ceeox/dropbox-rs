@@ -4,16 +4,19 @@ use serde_json;
 use std::path::Path;
 
 use error::*;
+use hyper::{Body, Method, Request};
 use models::error::*;
 use models::users::*;
 use DropboxContext;
+use USER_AGENT;
 
+#[derive(Clone)]
 pub struct DropboxUsers {
 	ctx: DropboxContext,
 }
 
 impl DropboxUsers {
-	pub fn new(context: &DropboxContext) -> Self {
+	pub(crate) fn new(context: &DropboxContext) -> Self {
 		Self {
 			ctx: context.clone(),
 		}
@@ -25,34 +28,76 @@ impl DropboxUsers {
 		arg: GetAccountArg,
 	) -> Result<impl Future<Item = BasicAccount, Error = DropboxError>> {
 		let uri = gen_uri!("users", "get_account");
-		let body: String = serde_json::to_string(&arg)?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Method::POST, Some(body));
 		Ok(self
 			.ctx
-			.send_request::<BasicAccount, GetAccountError>(&uri, body))
+			.request(request)
+			.and_then(|body| match serde_json::from_slice::<BasicAccount>(&body) {
+				Err(_) => match serde_json::from_slice::<Error<GetAccountError>>(&body) {
+					Err(e) => Err(DropboxError::Other(
+						String::from_utf8(body.to_vec()).unwrap(),
+					)),
+					Ok(r) => Err(DropboxError::from(r)),
+				},
+				Ok(r) => Ok(r),
+			}).from_err::<DropboxError>())
 	}
 
-	/// Get information about multiple user accounts. At most 300 accounts may be queried per request.
+	/// Get information about multiple user accounts.
+	/// At most 300 accounts may be queried per request.
 	pub fn get_account_batch(
 		&self,
 		arg: GetAccountBatchArg,
-	) -> Result<impl Future<Item = BasicAccount, Error = DropboxError>> {
+	) -> Result<impl Future<Item = Vec<BasicAccount>, Error = DropboxError>> {
 		let uri = gen_uri!("users", "get_account_batch");
-		let body: String = serde_json::to_string(&arg)?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Method::POST, Some(body));
 		Ok(self
 			.ctx
-			.send_request::<BasicAccount, GetAccountError>(&uri, body))
+			.request(request)
+			.and_then(
+				|body| match serde_json::from_slice::<Vec<BasicAccount>>(&body) {
+					Err(_) => match serde_json::from_slice::<Error<GetAccountBatchError>>(&body) {
+						Err(e) => Err(DropboxError::Other(
+							String::from_utf8(body.to_vec()).unwrap(),
+						)),
+						Ok(r) => Err(DropboxError::from(r)),
+					},
+					Ok(r) => Ok(r),
+				},
+			).from_err::<DropboxError>())
 	}
 
 	/// Get information about the current user's account.
-	pub fn get_current_account(&self) -> impl Future<Item = FullAccount, Error = DropboxError> {
+	pub fn get_current_account(
+		&self,
+	) -> Result<impl Future<Item = FullAccount, Error = DropboxError>> {
 		let uri = gen_uri!("users", "get_current_account");
-		self.ctx
-			.send_request::<FullAccount, ()>(&uri, String::new())
+		let request = self.ctx.create_request(uri, Method::POST, None);
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| match serde_json::from_slice::<FullAccount>(&body) {
+				Err(e) => Err(DropboxError::Other(
+					String::from_utf8(body.to_vec()).unwrap(),
+				)),
+				Ok(r) => Ok(r),
+			}).from_err::<DropboxError>())
 	}
 
 	/// Get the space usage information for the current user's account.
-	pub fn get_space_usage(&self) -> impl Future<Item = SpaceUsage, Error = DropboxError> {
+	pub fn get_space_usage(&self) -> Result<impl Future<Item = SpaceUsage, Error = DropboxError>> {
 		let uri = gen_uri!("users", "get_space_usage");
-		self.ctx.send_request::<SpaceUsage, ()>(&uri, String::new())
+		let request = self.ctx.create_request(uri, Method::POST, None);
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| match serde_json::from_slice::<SpaceUsage>(&body) {
+				Err(e) => Err(DropboxError::Other(
+					String::from_utf8(body.to_vec()).unwrap(),
+				)),
+				Ok(r) => Ok(r),
+			}).from_err::<DropboxError>())
 	}
 }

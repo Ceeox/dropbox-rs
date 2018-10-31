@@ -1,14 +1,12 @@
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct GetAccountArg
-{
+pub struct GetAccountArg {
 	///  A user's account identifier.
 	pub account_id: String,
 }
 
 /// Basic information about any account.
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct BasicAccount
-{
+pub struct BasicAccount {
 	/// The user's unique Dropbox ID.
 	pub account_id: String,
 	/// Details of a user's name.
@@ -32,8 +30,7 @@ pub struct BasicAccount
 
 /// Representations for a person's name to assist with internationalization.
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct Name
-{
+pub struct Name {
 	/// Also known as a first name.
 	pub given_name: String,
 	/// Also known as a last name or family name.
@@ -48,16 +45,14 @@ pub struct Name
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct GetAccountBatchArg
-{
+pub struct GetAccountBatchArg {
 	/// List of user account identifiers. Should not contain any duplicate account IDs.
-	pub account_ids: Vec<String>
+	pub account_ids: Vec<String>,
 }
 
 /// Detailed information about the current user's account.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct FullAccount
-{
+pub struct FullAccount {
 	/// The user's unique Dropbox ID.
 	pub account_id: String,
 	/// Details of a user's name.
@@ -67,6 +62,8 @@ pub struct FullAccount
 	pub email: String,
 	/// Whether the user has verified their e-mail address.
 	pub email_verified: bool,
+	/// URL for the photo representing the user, if one is set.
+	pub profile_photo_url: Option<String>,
 	/// Whether the user has been disabled.
 	pub disabled: bool,
 	/// The language that the user specified. Locale tags will be IETF language tags.
@@ -78,8 +75,6 @@ pub struct FullAccount
 	pub is_paired: bool,
 	/// What type of account this user has.
 	pub account_type: AccountType,
-	/// URL for the photo representing the user, if one is set.
-	pub profile_photo_url: Option<String>,
 	/// The user's two-letter country code, if available. Country codes are based on ISO 3166-1.
 	pub country: Option<String>,
 	///  If this account is a member of a team, information about that team.
@@ -91,23 +86,22 @@ pub struct FullAccount
 /// What type of account this user has.
 /// This datatype comes from an imported namespace originally defined in the users_common namespace.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum AccountType
-{
+#[serde(tag = ".tag")]
+pub enum AccountType {
 	/// The basic account type.
-	#[serde(rename="basic")]
+	#[serde(rename = "basic")]
 	Basic,
 	/// The Dropbox Pro account type.
-	#[serde(rename="pro")]
+	#[serde(rename = "pro")]
 	Pro,
 	/// The Dropbox Business account type.
-	#[serde(rename="business")]
+	#[serde(rename = "business")]
 	Business,
 }
 
 /// Detailed information about a team.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct FullTeam
-{
+pub struct FullTeam {
 	/// The team's unique ID.
 	pub id: String,
 	/// The name of the team.
@@ -119,8 +113,7 @@ pub struct FullTeam
 /// Policies governing sharing within and outside of the team.
 /// This datatype comes from an imported namespace originally defined in the team_policies namespace.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct TeamSharingPolicies
-{
+pub struct TeamSharingPolicies {
 	/// Who can join folders shared by team members.
 	pub shared_folder_member_policy: SharedFolderMemberPolicy,
 	/// Which shared folders team members can join.
@@ -131,27 +124,25 @@ pub struct TeamSharingPolicies
 
 /// Policy governing who can be a member of a folder shared by a team member.
 /// This datatype comes from an imported namespace originally defined in the team_policies namespace.
-#[derive( Deserialize, Debug, Clone, PartialEq)]
-pub enum SharedFolderMemberPolicy
-{
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub enum SharedFolderMemberPolicy {
 	/// Only a teammate can be a member of a folder shared by a team member.
-	#[serde(rename="team")]
+	#[serde(rename = "team")]
 	Team,
 	/// Anyone can be a member of a folder shared by a team member.
-	#[serde(rename="anyone")]
+	#[serde(rename = "anyone")]
 	Anyone,
 }
 
 /// Policy governing which shared folders a team member can join.
 /// This datatype comes from an imported namespace originally defined in the team_policies namespace.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum SharedFolderJoinPolicy
-{
+pub enum SharedFolderJoinPolicy {
 	/// Team members can only join folders shared by teammates.
-	#[serde(rename="from_team_only")]
+	#[serde(rename = "from_team_only")]
 	FromTeamOnly,
 	/// Team members can join any shared folder, including those shared by users outside the team.
-	#[serde(rename="from_anyone")]
+	#[serde(rename = "from_anyone")]
 	FromAnyone,
 }
 
@@ -159,26 +150,24 @@ pub enum SharedFolderJoinPolicy
 /// or all shared links.
 /// This datatype comes from an imported namespace originally defined in the team_policies namespace.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum SharedLinkCreatePolicy
-{
+pub enum SharedLinkCreatePolicy {
 	/// By default, anyone can access newly created shared links.
 	/// No login will be required to access the shared links unless overridden.
-	#[serde(rename="default_public")]
+	#[serde(rename = "default_public")]
 	DefaultPublic,
 	/// By default, only members of the same team can access newly created shared links.
 	/// Login will be required to access the shared links unless overridden.
-	#[serde(rename="default_team_only")]
+	#[serde(rename = "default_team_only")]
 	DefaultTeamOnly,
 	/// Only members of the same team can access all shared links.
 	/// Login will be required to access all shared links.
-	#[serde(rename="team_only")]
+	#[serde(rename = "team_only")]
 	TeamOnly,
 }
 
 /// Information about a user's space usage and quota.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SpaceUsage
-{
+pub struct SpaceUsage {
 	/// The user's total space usage (bytes).
 	pub used: u64,
 	/// The user's space allocation.
@@ -187,27 +176,24 @@ pub struct SpaceUsage
 
 /// Space is allocated differently based on the type of account.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-#[serde(tag=".tag")]
-pub enum SpaceAllocation
-{
+#[serde(tag = ".tag")]
+pub enum SpaceAllocation {
 	/// The user's space allocation applies only to their individual account.
-	#[serde(rename="individual")]
+	#[serde(rename = "individual")]
 	Individual(IndividualSpaceAllocation),
 	/// The user shares space with other members of their team.
-	#[serde(rename="team")]
+	#[serde(rename = "team")]
 	Team(TeamSpaceAllocation),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct IndividualSpaceAllocation
-{
+pub struct IndividualSpaceAllocation {
 	/// The total space allocated to the user's account (bytes).
 	pub allocated: u64,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct TeamSpaceAllocation
-{
+pub struct TeamSpaceAllocation {
 	/// The total space currently used by the user's team (bytes).
 	pub used: u64,
 	/// The total space allocated to the user's team (bytes).

@@ -3,6 +3,7 @@ use std::io::Error as StdIoError;
 use std::string::FromUtf8Error;
 // extern uses
 use hyper::error::Error as HyperErr;
+use hyper::http::uri::InvalidUri;
 use hyper_tls::Error as TlsError;
 use serde_json::Error as SerdeJsonError;
 // intern uses
@@ -14,6 +15,7 @@ pub type Result<T> = ::std::result::Result<T, DropboxError>;
 pub enum DropboxError {
 	HyperError(HyperErr),
 	Utf8Error(FromUtf8Error),
+	InvalidUri(InvalidUri),
 	IoError(StdIoError),
 	JsonError(SerdeJsonError),
 	MissingDropboxApiResult,
@@ -44,7 +46,7 @@ pub enum DropboxError {
 	GetAccountError(Error<GetAccountError>),
 	GetAccountBatchError(Error<GetAccountBatchError>),
 
-	Other,
+	Other(String),
 }
 
 impl From<HyperErr> for DropboxError {
@@ -56,6 +58,12 @@ impl From<HyperErr> for DropboxError {
 impl From<FromUtf8Error> for DropboxError {
 	fn from(err: FromUtf8Error) -> DropboxError {
 		DropboxError::Utf8Error(err)
+	}
+}
+
+impl From<InvalidUri> for DropboxError {
+	fn from(err: InvalidUri) -> DropboxError {
+		DropboxError::InvalidUri(err)
 	}
 }
 
@@ -217,6 +225,6 @@ impl From<Error<GetAccountBatchError>> for DropboxError {
 
 impl From<Error<()>> for DropboxError {
 	fn from(err: Error<()>) -> DropboxError {
-		DropboxError::Other
+		DropboxError::Other("UnkownError".to_owned())
 	}
 }

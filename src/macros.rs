@@ -11,7 +11,7 @@ macro_rules! gen_uri {
 			func_calls.push_str(&format!("/{}", $api_func));
 		)*
 		format!("{}{}/{}{}", BASE_URL, API_VERSION,
-			$api_class, func_calls)
+			$api_class, func_calls).parse::<hyper::Uri>()?
 	});
 }
 
@@ -26,7 +26,7 @@ macro_rules! gen_upload_uri
 			func_calls.push_str(&format!("/{}", $api_func));
 		)*
 		format!("{}{}/{}{}", UPLOAD_URL, API_VERSION,
-			$api_class, func_calls)
+			$api_class, func_calls).parse::<hyper::Uri>()?
 	});
 }
 
