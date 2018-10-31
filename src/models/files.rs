@@ -1,13 +1,11 @@
-use ::models::error::*;
+use models::error::*;
+use serde;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct AlphaGetMetadataArg
-{
-}
+pub struct AlphaGetMetadataArg {}
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct RelocationArg
-{
+pub struct RelocationArg {
 	/// Path in the user's Dropbox to be copied or moved.
 	pub from_path: String,
 	/// Path in the user's Dropbox that is the destination.
@@ -25,8 +23,7 @@ pub struct RelocationArg
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct RelocationBatchArg
-{
+pub struct RelocationBatchArg {
 	/// List of entries to be moved or copied. Each entry is RelocationPath.
 	pub entries: Vec<RelocationPath>,
 	/// If true, copy_batch will copy contents in shared folder,
@@ -43,8 +40,7 @@ pub struct RelocationBatchArg
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct RelocationPath
-{
+pub struct RelocationPath {
 	/// This response indicates that the processing is asynchronous.
 	/// The string is an id that can be used to obtain the status of the asynchronous job.
 	pub from_path: String,
@@ -54,61 +50,54 @@ pub struct RelocationPath
 
 /// Result returned by copy_batch or move_batch that may either launch an asynchronous job or complete synchronously.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-#[serde(tag=".tag")]
-pub enum RelocationBatchLaunch
-{
-	#[serde(rename="async_job_id")]
+#[serde(tag = ".tag")]
+pub enum RelocationBatchLaunch {
+	#[serde(rename = "async_job_id")]
 	AsyncJobId(String),
-	#[serde(rename="complete")]
+	#[serde(rename = "complete")]
 	Complete(RelocationBatchResult),
 }
 
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct RelocationBatchResult
-{
+pub struct RelocationBatchResult {
 	pub entries: Vec<RelocationResult>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct RelocationResult
-{
+pub struct RelocationResult {
 	pub metadata: Metadata,
 }
 
 /// Arguments for methods that poll the status of an asynchronous job.
 /// This datatype comes from an imported namespace originally defined in the async namespace.
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct PollArg
-{
+pub struct PollArg {
 	/// Id of the asynchronous job.
 	/// This is the value of a response returned from the method that launched the job.
 	pub async_job_id: String,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum RelocationBatchJobStatus
-{
+pub enum RelocationBatchJobStatus {
 	/// The asynchronous job is still in progress.
-	#[serde(rename="in_progress")]
+	#[serde(rename = "in_progress")]
 	InProgress,
 	/// The batch delete has finished.
-	#[serde(rename="complete")]
+	#[serde(rename = "complete")]
 	Complete(RelocationBatchResult),
 	/// The batch delete has failed.
-	#[serde(rename="failed")]
+	#[serde(rename = "failed")]
 	Failed(RelocationBatchError),
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct GetCopyReferenceArg
-{
+pub struct GetCopyReferenceArg {
 	/// The path to the file or folder you want to get a copy reference to.
 	pub path: String,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct GetCopyReferenceResult
-{
+pub struct GetCopyReferenceResult {
 	/// Metadata of the file or folder.
 	pub metadata: Metadata,
 	/// A copy reference to the file or folder.
@@ -120,24 +109,21 @@ pub struct GetCopyReferenceResult
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct SaveCopyReferenceArg
-{
+pub struct SaveCopyReferenceArg {
 	/// A copy reference returned by copy_reference/get.
 	pub copy_reference: String,
 	/// Path in the user's Dropbox that is the destination.
-	pub path: String
+	pub path: String,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SaveCopyReferenceResult
-{
+pub struct SaveCopyReferenceResult {
 	/// The metadata of the saved file or folder in the user's Dropbox.
 	pub metadata: Metadata,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct CreateFolderArg
-{
+pub struct CreateFolderArg {
 	/// Path in the user's Dropbox to create.
 	pub path: String,
 	///  If there's a conflict, have the Dropbox server try to autorename the folder to avoid the conflict.
@@ -146,78 +132,69 @@ pub struct CreateFolderArg
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct DeleteArg
-{
+pub struct DeleteArg {
 	/// Path in the user's Dropbox to delete.
 	pub path: String,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct DeleteBatchArg
-{
-	pub entries: Vec<DeleteArg>
+pub struct DeleteBatchArg {
+	pub entries: Vec<DeleteArg>,
 }
 
 /// Result returned by delete_batch that may either launch an asynchronous job or complete synchronously.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-#[serde(tag=".tag")]
-pub enum DeleteBatchLaunch
-{
+#[serde(tag = ".tag")]
+pub enum DeleteBatchLaunch {
 	/// This response indicates that the processing is asynchronous.
 	/// The string is an id that can be used to obtain the status of the asynchronous job.
-	#[serde(rename="async_job_id")]
-	AsyncJobId{ async_job_id: String },
-	#[serde(rename="complete")]
+	#[serde(rename = "async_job_id")]
+	AsyncJobId { async_job_id: String },
+	#[serde(rename = "complete")]
 	Complete(DeleteBatchResult),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct DeleteBatchResult
-{
-	pub entries: Vec<DeleteBatchResultEntry>
+pub struct DeleteBatchResult {
+	pub entries: Vec<DeleteBatchResultEntry>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum DeleteBatchResultEntry
-{
-	#[serde(rename="success")]
+pub enum DeleteBatchResultEntry {
+	#[serde(rename = "success")]
 	Success(DeleteResult),
-	#[serde(rename="failure")]
+	#[serde(rename = "failure")]
 	Failure(DeleteError),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct DeleteResult
-{
+pub struct DeleteResult {
 	pub metadata: Metadata,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-#[serde(tag=".tag")]
-pub enum DeleteBatchJobStatus
-{
+#[serde(tag = ".tag")]
+pub enum DeleteBatchJobStatus {
 	/// The asynchronous job is still in progress.
-	#[serde(rename="in_progress")]
+	#[serde(rename = "in_progress")]
 	InProgress,
 	/// The batch delete has finished.
-	#[serde(rename="complete")]
+	#[serde(rename = "complete")]
 	Complete(DeleteBatchResult),
 	/// The batch delete has failed.
-	#[serde(rename="failed")]
-	Failed(DeleteBatchError)
+	#[serde(rename = "failed")]
+	Failed(DeleteBatchError),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum DeleteBatchError
-{
+pub enum DeleteBatchError {
 	/// There are too many write operations in user's Dropbox. Please retry this request.
-	#[serde(rename="too_many_write_operations")]
+	#[serde(rename = "too_many_write_operations")]
 	TooManyWriteOperations,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct DownloadArg
-{
+pub struct DownloadArg {
 	/// The path of the file to download.
 	pub path: String,
 	/// Deprecated. Please specify revision in path instead. This field is optional.
@@ -225,8 +202,7 @@ pub struct DownloadArg
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct GetMetadataArg
-{
+pub struct GetMetadataArg {
 	/// The path of a file or folder on Dropbox.
 	pub path: String,
 	/// If true, FileMetadata.media_info is set for photo and video. The default for this field is False.
@@ -240,22 +216,19 @@ pub struct GetMetadataArg
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct PreviewArg
-{
+pub struct PreviewArg {
 	/// The path of the file to preview.
 	pub path: String,
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct GetTemporaryLinkArg
-{
+pub struct GetTemporaryLinkArg {
 	/// The path to the file you want a temporary link to.
 	pub path: String,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct GetTemporaryLinkResult
-{
+pub struct GetTemporaryLinkResult {
 	/// Metadata of the file.
 	pub metadata: Metadata,
 	/// The temporary link which can be used to stream content the file.
@@ -263,8 +236,7 @@ pub struct GetTemporaryLinkResult
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct ThumbnailArg
-{
+pub struct ThumbnailArg {
 	/// The path to the image file you want to thumbnail.
 	pub path: String,
 	/// The format for the thumbnail image, jpeg (default) or png. For images that are photos,
@@ -276,50 +248,45 @@ pub struct ThumbnailArg
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub enum ThumbnailFormat
-{
-	#[serde(rename="png")]
+pub enum ThumbnailFormat {
+	#[serde(rename = "png")]
 	Png,
-	#[serde(rename="jpeg")]
+	#[serde(rename = "jpeg")]
 	Jpeg,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub enum ThumbnailSize
-{
+pub enum ThumbnailSize {
 	/// 32 by 32 px.
-	#[serde(rename="w32h32")]
+	#[serde(rename = "w32h32")]
 	W32h32,
 	/// 64 by 64 px.
-	#[serde(rename="w64h64")]
+	#[serde(rename = "w64h64")]
 	W64h64,
 	/// 128 by 128 px.
-	#[serde(rename="w128h128")]
+	#[serde(rename = "w128h128")]
 	W128h128,
 	/// 640 by 480 px.
-	#[serde(rename="w640h640")]
+	#[serde(rename = "w640h640")]
 	W640h640,
 	/// 1024 by 768.
-	#[serde(rename="w1024h1024")]
+	#[serde(rename = "w1024h1024")]
 	W1024h1024,
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct ListFolderContinueArg
-{
+pub struct ListFolderContinueArg {
 	pub cursor: String,
 }
 
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct ListFolderGetLatestCursorResult
-{
+pub struct ListFolderGetLatestCursorResult {
 	/// The cursor returned by your last call to list_folder or list_folder/continue.
 	pub cursor: String,
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct ListFolderLongpollArg
-{
+pub struct ListFolderLongpollArg {
 	/// A cursor as returned by list_folder or list_folder/continue.
 	/// Cursors retrieved by setting ListFolderArg.include_media_info to true are not supported.
 	pub cursor: String,
@@ -331,8 +298,7 @@ pub struct ListFolderLongpollArg
 }
 
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct ListFolderLongpollResult
-{
+pub struct ListFolderLongpollResult {
 	///  Indicates whether new changes are available.
 	/// If true, call list_folder/continue to retrieve the changes.
 	pub changes: bool,
@@ -342,8 +308,7 @@ pub struct ListFolderLongpollResult
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct ListRevisionsArg
-{
+pub struct ListRevisionsArg {
 	/// The path to the file you want to see the revisions of.
 	pub path: String,
 	/// The maximum number of revision entries returned. The default for this field is 10.
@@ -351,8 +316,7 @@ pub struct ListRevisionsArg
 }
 
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct ListRevisionsResult
-{
+pub struct ListRevisionsResult {
 	/// If the file is deleted.
 	pub is_deleted: bool,
 	/// The revisions for the file. Only non-delete revisions will show up here.
@@ -360,8 +324,7 @@ pub struct ListRevisionsResult
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct ListFolderArg
-{
+pub struct ListFolderArg {
 	/// The path to the folder you want to see the contents of.
 	pub path: String,
 	/// If true, the list folder operation will be applied recursively to all subfolders and
@@ -380,8 +343,7 @@ pub struct ListFolderArg
 }
 
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct ListFolderResult
-{
+pub struct ListFolderResult {
 	/// The files and (direct) subfolders in the folder.
 	pub entries: Vec<Metadata>,
 	/// Pass the cursor into list_folder/continue to see what's changed in the folder since your previous query.
@@ -393,20 +355,18 @@ pub struct ListFolderResult
 
 /// Metadata for a file or folder. This datatype will be one of the following subtypes:
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-#[serde(tag=".tag")]
-pub enum Metadata
-{
-	#[serde(rename="file")]
+#[serde(tag = ".tag")]
+pub enum Metadata {
+	#[serde(rename = "file")]
 	File(FileMetadata),
-	#[serde(rename="folder")]
+	#[serde(rename = "folder")]
 	Folder(FolderMetadata),
-	#[serde(rename="deleted")]
+	#[serde(rename = "deleted")]
 	Deleted(DeletedMetadata),
 }
 
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct FileMetadata
-{
+pub struct FileMetadata {
 	/// The last component of the path (including extension). This never contains a slash.
 	pub name: String,
 	///  A unique identifier for the file.
@@ -456,32 +416,29 @@ pub struct FileMetadata
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum MediaInfo
-{
+pub enum MediaInfo {
 	/// Indicate the photo/video is still under processing and metadata is not available yet.
-	#[serde(rename="pending")]
+	#[serde(rename = "pending")]
 	Pending,
 	/// The metadata for the photo/video.
-	#[serde(rename="metadata")]
+	#[serde(rename = "metadata")]
 	Metadata(MediaMetadata),
 }
 
 /// Additional information if the file is a photo or video.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum MediaMetadata
-{
+pub enum MediaMetadata {
 	/// Metadata for a photo.
-	#[serde(rename="photo")]
+	#[serde(rename = "photo")]
 	Photo(PhotoMetadata),
 	/// Metadata for a video.
-	#[serde(rename="video")]
+	#[serde(rename = "video")]
 	Video(VideoMetadata),
 }
 
 /// Metadata for a photo.
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct PhotoMetadata
-{
+pub struct PhotoMetadata {
 	/// Dimension of the photo/video.
 	pub dimensions: Option<Dimensions>,
 	/// The GPS coordinate of the photo/video.
@@ -492,8 +449,7 @@ pub struct PhotoMetadata
 
 /// Dimension of the photo/video.
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct Dimensions
-{
+pub struct Dimensions {
 	/// Height of the photo/video.
 	pub height: u64,
 	/// Width of the photo/video.
@@ -502,8 +458,7 @@ pub struct Dimensions
 
 /// The GPS coordinate of the photo/video.
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct GpsCoordinates
-{
+pub struct GpsCoordinates {
 	/// Latitude of the GPS coordinates.
 	pub latitude: f64,
 	///  Longitude of the GPS coordinates.
@@ -512,8 +467,7 @@ pub struct GpsCoordinates
 
 /// Metadata for a video.
 #[derive(Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct VideoMetadata
-{
+pub struct VideoMetadata {
 	/// Dimension of the photo/video.
 	pub dimensions: Option<Dimensions>,
 	/// The GPS coordinate of the photo/video.
@@ -526,8 +480,7 @@ pub struct VideoMetadata
 
 /// Sharing info for a file which is contained by a shared folder.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct FileSharingInfo
-{
+pub struct FileSharingInfo {
 	/// Additional information if the file has custom properties with the property template specified.
 	pub read_only: bool,
 	/// This flag will only be present if include_has_explicit_shared_members is true in list_folder or get_metadata.
@@ -543,8 +496,7 @@ pub struct FileSharingInfo
 /// Collection of custom properties in filled property templates.
 /// This datatype comes from an imported namespace originally defined in the properties namespace.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct PropertyGroup
-{
+pub struct PropertyGroup {
 	/// A unique identifier for a property template type.
 	pub template_id: String,
 	/// This is a list of custom properties associated with a file.
@@ -553,8 +505,7 @@ pub struct PropertyGroup
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct FolderMetadata
-{
+pub struct FolderMetadata {
 	/// The last component of the path (including extension). This never contains a slash.
 	pub name: String,
 	/// A unique identifier for the folder.
@@ -581,8 +532,7 @@ pub struct FolderMetadata
 
 /// Sharing info for a folder which is contained in a shared folder or is a shared folder mount point.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct FolderSharingInfo
-{
+pub struct FolderSharingInfo {
 	/// True if the file or folder is inside a read-only shared folder.
 	pub read_only: bool,
 	/// Set if the folder is contained by a shared folder. This field is optional.
@@ -599,8 +549,7 @@ pub struct FolderSharingInfo
 
 /// This datatype comes from an imported namespace originally defined in the properties namespace.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct PropertyField
-{
+pub struct PropertyField {
 	/// This is the name or key of a custom property in a property template.
 	/// File property names can be up to 256 bytes.
 	pub name: String,
@@ -610,8 +559,7 @@ pub struct PropertyField
 
 /// Indicates that there used to be a file or folder at this path, but it no longer exists.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct DeletedMetadata
-{
+pub struct DeletedMetadata {
 	/// The last component of the path (including extension). This never contains a slash.
 	pub name: String,
 	/// The lowercased full path in the user's Dropbox.
@@ -631,8 +579,7 @@ pub struct DeletedMetadata
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct RestoreArg
-{
+pub struct RestoreArg {
 	/// The path to the file you want to restore.
 	pub path: String,
 	/// The revision to restore for the file.
@@ -640,8 +587,7 @@ pub struct RestoreArg
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-pub struct SaveUrlArg
-{
+pub struct SaveUrlArg {
 	/// The path in Dropbox where the URL will be saved to.
 	pub path: String,
 	/// The URL to be saved.
@@ -649,33 +595,30 @@ pub struct SaveUrlArg
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum SaveUrlResult
-{
+pub enum SaveUrlResult {
 	/// This response indicates that the processing is asynchronous.
 	/// The string is an id that can be used to obtain the status of the asynchronous job.
-	#[serde(rename="async_job_id")]
+	#[serde(rename = "async_job_id")]
 	AsyncJobId(String),
 	/// Metadata of the file where the URL is saved to.
-	#[serde(rename="complete")]
+	#[serde(rename = "complete")]
 	Complete(FileMetadata),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum SaveUrlJobStatus
-{
+pub enum SaveUrlJobStatus {
 	/// The asynchronous job is still in progress.
-	#[serde(rename="in_progress")]
+	#[serde(rename = "in_progress")]
 	InProgress,
 	/// Metadata of the file where the URL is saved to.
-	#[serde(rename="complete")]
+	#[serde(rename = "complete")]
 	Complete(FileMetadata),
-	#[serde(rename="failed")]
+	#[serde(rename = "failed")]
 	Failed(SaveUrlError),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct SearchArg
-{
+pub struct SearchArg {
 	/// The path in the user's Dropbox to search. Should probably be a folder.
 	pub path: String,
 	/// The string to search for. The search string is split on spaces into multiple tokens.
@@ -693,22 +636,20 @@ pub struct SearchArg
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub enum SearchMode
-{
+pub enum SearchMode {
 	/// Search file and folder names.
-	#[serde(rename="filename")]
+	#[serde(rename = "filename")]
 	Filename,
 	/// Search file and folder names as well as file contents.
-	#[serde(rename="filename_and_content")]
+	#[serde(rename = "filename_and_content")]
 	FilenameAndContent,
 	/// Search for deleted file and folder names.
-	#[serde(rename="deleted_filename")]
+	#[serde(rename = "deleted_filename")]
 	DeletedFilename,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SearchResult
-{
+pub struct SearchResult {
 	/// A list (possibly empty) of matches for the query.
 	pub matches: Vec<SearchMatch>,
 	/// Used for paging. If true, indicates there is another page of results available that
@@ -719,8 +660,7 @@ pub struct SearchResult
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct SearchMatch
-{
+pub struct SearchMatch {
 	/// The type of the match.
 	pub match_type: SearchMatchType,
 	/// The metadata for the matched file or folder.
@@ -729,22 +669,20 @@ pub struct SearchMatch
 
 /// Indicates what type of match was found for a given item.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum SearchMatchType
-{
+pub enum SearchMatchType {
 	/// This item was matched on its file or folder name.
-	#[serde(rename="filename")]
+	#[serde(rename = "filename")]
 	Filename,
 	/// This item was matched based on its file contents.
-	#[serde(rename="content")]
+	#[serde(rename = "content")]
 	Content,
 	/// This item was matched based on both its contents and its file name.
-	#[serde(rename="both")]
+	#[serde(rename = "both")]
 	Both,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct CommitInfo
-{
+pub struct CommitInfo {
 	/// Path in the user's Dropbox to save the file.
 	pub path: String,
 	/// Selects what to do if the file already exists. The default for this union is add.
@@ -774,26 +712,24 @@ pub struct CommitInfo
 /// The conflict checking differs in the case where there's a file at the target path with contents different
 /// from the contents you're trying to write.
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub enum WriteMode
-{
+pub enum WriteMode {
 	/// Do not overwrite an existing file if there is a conflict.
 	/// The autorename strategy is to append a number to the file name. For example,
 	/// "document.txt" might become "document (2).txt".
-	#[serde(rename="add")]
+	#[serde(rename = "add")]
 	Add,
 	/// Always overwrite the existing file. The autorename strategy is the same as it is for add.
-	#[serde(rename="overwrite")]
+	#[serde(rename = "overwrite")]
 	Overwrite,
 	/// Overwrite if the given "rev" matches the existing file's "rev".
 	/// The autorename strategy is to append the string "conflicted copy" to the file name. For example,
 	/// "document.txt" might become "document (conflicted copy).txt" or "document (Panda's conflicted copy).txt".
-	#[serde(rename="update")]
+	#[serde(rename = "update")]
 	Update(String),
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct UploadSessionAppendArg
-{
+pub struct UploadSessionAppendArg {
 	/// Contains the upload session ID and the offset.
 	pub cursor: UploadSessionCursor,
 	/// If true, the current session will be closed, at which point you won't be able to call upload_session/append_v2
@@ -802,8 +738,7 @@ pub struct UploadSessionAppendArg
 }
 
 #[derive(Serialize, Debug, Clone, Default, PartialEq)]
-pub struct UploadSessionCursor
-{
+pub struct UploadSessionCursor {
 	/// The upload session ID (returned by upload_session/start).
 	pub session_id: String,
 	/// The amount of data that has been uploaded so far.
@@ -812,8 +747,7 @@ pub struct UploadSessionCursor
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct UploadSessionFinishArg
-{
+pub struct UploadSessionFinishArg {
 	/// Contains the upload session ID and the offset.
 	pub cursor: UploadSessionCursor,
 	/// Contains the path and other optional modifiers for the commit.
@@ -821,54 +755,48 @@ pub struct UploadSessionFinishArg
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct UploadSessionFinishBatchArg
-{
+pub struct UploadSessionFinishBatchArg {
 	/// Commit information for each file in the batch.
 	pub entries: Vec<UploadSessionFinishArg>,
 }
 
 /// Result returned by upload_session/finish_batch that may either launch an asynchronous job or complete synchronously.
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum UploadSessionFinishBatchLaunch
-{
+pub enum UploadSessionFinishBatchLaunch {
 	/// his response indicates that the processing is asynchronous.
 	/// The string is an id that can be used to obtain the status of the asynchronous job.
-	#[serde(rename="async_job_id")]
+	#[serde(rename = "async_job_id")]
 	AsyncJobId(String),
-	#[serde(rename="complete")]
+	#[serde(rename = "complete")]
 	Complete(UploadSessionFinishBatchResult),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct UploadSessionFinishBatchResult
-{
+pub struct UploadSessionFinishBatchResult {
 	/// Commit result for each file in the batch.
-	pub entries: Vec<UploadSessionFinishBatchResultEntry>
+	pub entries: Vec<UploadSessionFinishBatchResultEntry>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum UploadSessionFinishBatchResultEntry
-{
-	#[serde(rename="success")]
+pub enum UploadSessionFinishBatchResultEntry {
+	#[serde(rename = "success")]
 	Success(FileMetadata),
-	#[serde(rename="failure")]
+	#[serde(rename = "failure")]
 	Failure(UploadSessionFinishError),
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub enum UploadSessionFinishBatchJobStatus
-{
+pub enum UploadSessionFinishBatchJobStatus {
 	/// The asynchronous job is still in progress.
-	#[serde(rename="in_progress")]
+	#[serde(rename = "in_progress")]
 	InProgress,
 	/// The upload_session/finish_batch has finished.
-	#[serde(rename="complete")]
+	#[serde(rename = "complete")]
 	Complete(UploadSessionFinishBatchResult),
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq)]
-pub struct UploadSessionStartArg
-{
+pub struct UploadSessionStartArg {
 	/// If true, the current session will be closed,
 	/// at which point you won't be able to call upload_session/append_v2 anymore with the current session.
 	/// The default for this field is False.
@@ -876,8 +804,7 @@ pub struct UploadSessionStartArg
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
-pub struct UploadSessionStartResult
-{
+pub struct UploadSessionStartResult {
 	/// A unique identifier for the upload session.
 	/// Pass this to upload_session/append_v2 and upload_session/finish.
 	pub session_id: String,
