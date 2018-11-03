@@ -8,7 +8,6 @@ use hyper::{Body, Method, Request};
 use models::error::*;
 use models::users::*;
 use DropboxContext;
-use USER_AGENT;
 
 #[derive(Clone)]
 pub struct DropboxUsers {
@@ -33,15 +32,8 @@ impl DropboxUsers {
 		Ok(self
 			.ctx
 			.request(request)
-			.and_then(|body| match serde_json::from_slice::<BasicAccount>(&body) {
-				Err(_) => match serde_json::from_slice::<Error<GetAccountError>>(&body) {
-					Err(e) => Err(DropboxError::Other(
-						String::from_utf8(body.to_vec()).unwrap(),
-					)),
-					Ok(r) => Err(DropboxError::from(r)),
-				},
-				Ok(r) => Ok(r),
-			}).from_err::<DropboxError>())
+			.and_then(|body| check!(BasicAccount, GetAccountError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Get information about multiple user accounts.
@@ -56,17 +48,8 @@ impl DropboxUsers {
 		Ok(self
 			.ctx
 			.request(request)
-			.and_then(
-				|body| match serde_json::from_slice::<Vec<BasicAccount>>(&body) {
-					Err(_) => match serde_json::from_slice::<Error<GetAccountBatchError>>(&body) {
-						Err(e) => Err(DropboxError::Other(
-							String::from_utf8(body.to_vec()).unwrap(),
-						)),
-						Ok(r) => Err(DropboxError::from(r)),
-					},
-					Ok(r) => Ok(r),
-				},
-			).from_err::<DropboxError>())
+			.and_then(|body| check!(Vec<BasicAccount>, GetAccountBatchError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Get information about the current user's account.
@@ -78,12 +61,8 @@ impl DropboxUsers {
 		Ok(self
 			.ctx
 			.request(request)
-			.and_then(|body| match serde_json::from_slice::<FullAccount>(&body) {
-				Err(e) => Err(DropboxError::Other(
-					String::from_utf8(body.to_vec()).unwrap(),
-				)),
-				Ok(r) => Ok(r),
-			}).from_err::<DropboxError>())
+			.and_then(|body| simple_check!(FullAccount, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Get the space usage information for the current user's account.
@@ -93,11 +72,7 @@ impl DropboxUsers {
 		Ok(self
 			.ctx
 			.request(request)
-			.and_then(|body| match serde_json::from_slice::<SpaceUsage>(&body) {
-				Err(e) => Err(DropboxError::Other(
-					String::from_utf8(body.to_vec()).unwrap(),
-				)),
-				Ok(r) => Ok(r),
-			}).from_err::<DropboxError>())
+			.and_then(|body| simple_check!(SpaceUsage, body))
+			.from_err::<DropboxError>())
 	}
 }

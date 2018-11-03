@@ -15,10 +15,8 @@ macro_rules! gen_uri {
 	});
 }
 
-macro_rules! gen_upload_uri
-{
-	( $api_class:expr, $($api_func:expr),* ) =>
-	({
+macro_rules! gen_upload_uri {
+	( $api_class:expr, $($api_func:expr),* ) =>({
 		use UPLOAD_URL;
 		use API_VERSION;
 		let mut func_calls = String::new();
@@ -28,6 +26,28 @@ macro_rules! gen_upload_uri
 		format!("{}{}/{}{}", UPLOAD_URL, API_VERSION,
 			$api_class, func_calls).parse::<hyper::Uri>()?
 	});
+}
+
+// TODO: Add documentaion for this two marcos and tests
+macro_rules! check {
+	( $result_class:ty, $error_class:ty, $body:ident ) => {{
+		match serde_json::from_slice::<$result_class>(&$body) {
+			Err(_) => match serde_json::from_slice::<Error<$error_class>>(&$body) {
+				Err(e) => Err(DropboxError::Other(String::from_utf8($body.to_vec())?)),
+				Ok(r) => Err(DropboxError::from(r)),
+			},
+			Ok(r) => Ok(r),
+			}
+		}};
+}
+
+macro_rules! simple_check {
+	( $result_class:ty, $body:ident ) => {{
+		match serde_json::from_slice::<$result_class>(&$body) {
+			Err(e) => Err(DropboxError::Other(String::from_utf8($body.to_vec())?)),
+			Ok(r) => Ok(r),
+			}
+		}};
 }
 
 #[cfg(test)]
