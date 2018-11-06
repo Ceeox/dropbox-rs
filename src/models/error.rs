@@ -1,5 +1,3 @@
-use serde::*;
-
 #[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Error<T> {
 	error_summary: String,

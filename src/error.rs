@@ -224,7 +224,7 @@ impl From<Error<GetAccountBatchError>> for DropboxError {
 }
 
 impl From<Error<()>> for DropboxError {
-	fn from(err: Error<()>) -> DropboxError {
+	fn from(_: Error<()>) -> DropboxError {
 		DropboxError::Other("UnkownError".to_owned())
 	}
 }

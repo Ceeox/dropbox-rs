@@ -1,5 +1,4 @@
 use models::error::*;
-use serde;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct AlphaGetMetadataArg {}

@@ -48,16 +48,14 @@ use std::path::Path;
 use std::sync::Arc;
 // crate uses
 use hyper::client::HttpConnector;
-use hyper::http::request::Builder;
 use hyper::rt::{Future, Stream};
-use hyper::{Body, Chunk, Client, Method, Request, Uri};
+use hyper::{Body, Client, Method, Request, Uri};
 use hyper_tls::HttpsConnector;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 // intern uses
 use error::*;
 //use files::DropboxFiles;
-use models::error::Error;
 use users::DropboxUsers;
 
 // consts or statics
@@ -78,6 +76,7 @@ impl DropboxContext {
 	/// Creates a context this holds the http client and the token
 	pub fn new(token: &str) -> Result<Self> {
 		let https = HttpsConnector::new(4)?;
+		// keep_alive must be set or else the tokio_runtime runs infinitly
 		let client = Client::builder().keep_alive(false).build(https);
 		let token = Arc::new(token.to_owned());
 		Ok(DropboxContext { client, token })
@@ -101,12 +100,7 @@ impl DropboxContext {
 	}
 
 	#[inline]
-	pub(crate) fn client(&self) -> &Client<HttpsConnector<HttpConnector>, Body> {
-		&self.client
-	}
-
-	#[inline]
-	pub(crate) fn change_token(&mut self, new_token: String) {
+	fn change_token(&mut self, new_token: String) {
 		self.token = Arc::new(new_token);
 	}
 
@@ -114,6 +108,7 @@ impl DropboxContext {
 		&self,
 		request: Request<Body>,
 	) -> impl Future<Item = hyper::Chunk, Error = DropboxError> {
+		trace!("Request: {:?}", request);
 		self.client
 			.request(request)
 			.and_then(|res| res.into_body().concat2())

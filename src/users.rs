@@ -1,10 +1,8 @@
 use hyper::rt::*;
 use serde_json;
 
-use std::path::Path;
-
 use error::*;
-use hyper::{Body, Method, Request};
+use hyper::Method;
 use models::error::*;
 use models::users::*;
 use DropboxContext;
@@ -22,10 +20,11 @@ impl DropboxUsers {
 	}
 
 	/// Get information about a user's account.
-	pub fn get_account(
-		&self,
-		arg: GetAccountArg,
-	) -> Result<impl Future<Item = BasicAccount, Error = DropboxError>> {
+	pub fn get_account<I, E>(&self, arg: GetAccountArg) -> Result<impl Future<Item = I, Error = E>>
+	where
+		I: BasicAccount,
+		E: DropboxError,
+	{
 		let uri = gen_uri!("users", "get_account");
 		let body = serde_json::to_vec(&arg)?;
 		let request = self.ctx.create_request(uri, Method::POST, Some(body));

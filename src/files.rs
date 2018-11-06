@@ -24,19 +24,18 @@ impl DropboxFiles {
 
 	/// Copy a file or folder to a different location in the user's Dropbox.
 	/// If the source path is a folder all its contents will be copied.
-	pub fn copy(&self, arg: RelocationArg) -> Result<Metadata> {
+	pub fn copy(
+		&self,
+		arg: RelocationArg,
+	) -> Result<impl Future<Item = Metadata, Error = DropboxError>> {
 		let uri = gen_uri!("files", "copy");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<Metadata>(&resp) {
-			Err(_) => Err(
-				match serde_json::from_str::<Error<RelocationError>>(&resp) {
-					Err(_) => DropboxError::Other,
-					Ok(r) => DropboxError::RelocationError(r),
-				},
-			),
-			Ok(r) => Ok(r),
-		}
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| check!(Metadata, GetMetadataError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Copy multiple files or folders to different locations at once in the user's Dropbox.
@@ -46,29 +45,34 @@ impl DropboxFiles {
 	/// but you will be able to copy the contents of shared folders to new locations.
 	/// This route will return job ID immediately and do the async copy job in background.
 	/// Please use copy_batch/check to check the job status.
-	pub fn copy_batch(&self, arg: RelocationBatchArg) -> Result<RelocationBatchLaunch> {
+	pub fn copy_batch(
+		&self,
+		arg: RelocationBatchArg,
+	) -> Result<impl Future<Item = RelocationBatchLaunch, Error = DropboxError>> {
 		let uri = gen_uri!("files", "copy_batch");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<RelocationBatchLaunch>(&resp) {
-			Err(_) => Err(DropboxError::Other),
-			Ok(r) => Ok(r),
-		}
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| simple_check!(RelocationBatchLaunch, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Returns the status of an asynchronous job for copy_batch.
 	/// If success, it returns list of results for each entry.
-	pub fn copy_batch_check(&self, arg: PollArg) -> Result<RelocationBatchJobStatus> {
+	pub fn copy_batch_check(
+		&self,
+		arg: PollArg,
+	) -> Result<impl Future<Item = RelocationBatchJobStatus, Error = DropboxError>> {
 		let uri = gen_uri!("files", "copy");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<RelocationBatchJobStatus>(&resp) {
-			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp) {
-				Err(_) => DropboxError::Other,
-				Ok(r) => DropboxError::PollError(r),
-			}),
-			Ok(r) => Ok(r),
-		}
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| simple_check!(RelocationBatchJobStatus, PollError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Get a copy reference to a file or folder.

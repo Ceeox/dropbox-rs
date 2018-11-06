@@ -29,18 +29,23 @@ macro_rules! gen_upload_uri {
 }
 
 // TODO: Add documentaion for this two marcos and tests
+#[inline]
 macro_rules! check {
 	( $result_class:ty, $error_class:ty, $body:ident ) => {{
 		match serde_json::from_slice::<$result_class>(&$body) {
-			Err(_) => match serde_json::from_slice::<Error<$error_class>>(&$body) {
-				Err(e) => Err(DropboxError::Other(String::from_utf8($body.to_vec())?)),
-				Ok(r) => Err(DropboxError::from(r)),
-			},
+			Err(e) => {
+				error!("Error in parsing: {:?}", e);
+				match serde_json::from_slice::<Error<$error_class>>(&$body) {
+					Err(_) => Err(DropboxError::Other(String::from_utf8($body.to_vec())?)),
+					Ok(r) => Err(DropboxError::from(r)),
+				}
+				}
 			Ok(r) => Ok(r),
 			}
 		}};
 }
 
+#[inline]
 macro_rules! simple_check {
 	( $result_class:ty, $body:ident ) => {{
 		match serde_json::from_slice::<$result_class>(&$body) {
