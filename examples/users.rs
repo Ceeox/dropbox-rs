@@ -5,12 +5,11 @@ use dropbox::Dropbox;
 use hyper::rt::Future;
 
 static KEY: &str = "this_is_my_auth_key";
-static ACCOUNT_ID = "dbid:this_is_my_accout_id";
+static ACCOUNT_ID: &str = "dbid:this_is_my_accout_id";
 
 fn main() {
     let dbx = Dropbox::new(KEY.to_owned()).unwrap();
-    
-    
+
     println!("Users get_account:");
     let res1 = dbx
         .users
