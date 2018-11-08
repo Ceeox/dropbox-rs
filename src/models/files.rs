@@ -1,4 +1,4 @@
-use models::error::*;
+use crate::models::error::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 pub struct AlphaGetMetadataArg {}

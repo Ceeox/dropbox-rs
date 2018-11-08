@@ -4,8 +4,8 @@
 macro_rules! gen_uri {
 	( $api_class:expr, $($api_func:expr),* ) =>
 	({
-		use BASE_URL;
-		use API_VERSION;
+		use crate::API_VERSION;
+		use crate::BASE_URL;
 		let mut func_calls = String::new();
 		$(
 			func_calls.push_str(&format!("/{}", $api_func));
@@ -17,8 +17,8 @@ macro_rules! gen_uri {
 
 macro_rules! gen_upload_uri {
 	( $api_class:expr, $($api_func:expr),* ) =>({
-		use UPLOAD_URL;
-		use API_VERSION;
+		use crate::API_VERSION;
+		use crate::BASE_URL;
 		let mut func_calls = String::new();
 		$(
 			func_calls.push_str(&format!("/{}", $api_func));
@@ -49,7 +49,7 @@ macro_rules! check {
 macro_rules! simple_check {
 	( $result_class:ty, $body:ident ) => {{
 		match serde_json::from_slice::<$result_class>(&$body) {
-			Err(e) => Err(DropboxError::Other(String::from_utf8($body.to_vec())?)),
+			Err(_e) => Err(DropboxError::Other(String::from_utf8($body.to_vec())?)),
 			Ok(r) => Ok(r),
 			}
 		}};

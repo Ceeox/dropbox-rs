@@ -51,12 +51,11 @@ use hyper::client::HttpConnector;
 use hyper::rt::{Future, Stream};
 use hyper::{Body, Client, Method, Request, Uri};
 use hyper_tls::HttpsConnector;
-use serde::Serialize;
 
 // intern uses
-use error::*;
+use crate::error::*;
 //use files::DropboxFiles;
-use users::DropboxUsers;
+use crate::users::DropboxUsers;
 
 // consts or statics
 static BASE_URL: &str = "https://api.dropboxapi.com";
@@ -115,11 +114,11 @@ impl DropboxContext {
 			.from_err::<DropboxError>()
 	}
 
-	fn download(&self, uri: &str, arg: &str, file_path: &Path) -> Result<String> {
+	fn download(&self, _uri: &str, _arg: &str, _file_path: &Path) -> Result<String> {
 		Err(DropboxError::Other(String::from("Not Implemented")))
 	}
 
-	fn upload(&self, uri: &str, arg: &str, file_path: &Path) -> Result<String> {
+	fn upload(&self, _uri: &str, _arg: &str, _file_path: &Path) -> Result<String> {
 		/*
 		let request = Request::builder()
 			.uri(uri)

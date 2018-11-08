@@ -1,11 +1,11 @@
 use hyper::rt::*;
+use hyper::Method;
 use serde_json;
 
-use error::*;
-use hyper::Method;
-use models::error::*;
-use models::users::*;
-use DropboxContext;
+use crate::error::*;
+use crate::models::error::*;
+use crate::models::users::*;
+use crate::DropboxContext;
 
 #[derive(Clone)]
 pub struct DropboxUsers {
@@ -20,11 +20,10 @@ impl DropboxUsers {
 	}
 
 	/// Get information about a user's account.
-	pub fn get_account<I, E>(&self, arg: GetAccountArg) -> Result<impl Future<Item = I, Error = E>>
-	where
-		I: BasicAccount,
-		E: DropboxError,
-	{
+	pub fn get_account(
+		&self,
+		arg: GetAccountArg,
+	) -> Result<impl Future<Item = BasicAccount, Error = DropboxError>> {
 		let uri = gen_uri!("users", "get_account");
 		let body = serde_json::to_vec(&arg)?;
 		let request = self.ctx.create_request(uri, Method::POST, Some(body));

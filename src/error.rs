@@ -7,7 +7,7 @@ use hyper::http::uri::InvalidUri;
 use hyper_tls::Error as TlsError;
 use serde_json::Error as SerdeJsonError;
 // intern uses
-use models::error::*;
+use crate::models::error::*;
 
 pub type Result<T> = ::std::result::Result<T, DropboxError>;
 
