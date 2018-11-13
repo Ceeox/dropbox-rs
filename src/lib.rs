@@ -81,11 +81,11 @@ impl DropboxContext {
 		Ok(DropboxContext { client, token })
 	}
 
-	fn create_request(&self, uri: Uri, method: Method, body: Option<Vec<u8>>) -> Request<Body> {
+	fn create_request(&self, uri: Uri, body: Option<Vec<u8>>) -> Request<Body> {
 		let mut request = Request::builder();
 		request
 			.uri(uri)
-			.method(method)
+			.method(Method::POST)
 			.header("User-Agent", USER_AGENT)
 			.header("Authorization", format!("Bearer {}", self.token.clone()));
 
@@ -96,6 +96,31 @@ impl DropboxContext {
 				.unwrap(),
 			None => request.body(Body::empty()).unwrap(),
 		}
+	}
+
+	fn create_download_request(&self, uri: Uri, download_arg: String) -> Request<Body> {
+		let mut request = Request::builder();
+		request
+			.uri(uri)
+			.method(Method::POST)
+			.header("User-Agent", USER_AGENT)
+			.header("Authorization", format!("Bearer {}", self.token.clone()))
+			.header("Dropbox-API-Arg", download_arg)
+			.body(Body::empty())
+			.unwrap()
+	}
+
+	fn create_upload_request(&self, uri: Uri, upload_arg: String, body: Vec<u8>) -> Request<Body> {
+		let mut request = Request::builder();
+		request
+			.uri(uri)
+			.method(Method::POST)
+			.header("User-Agent", USER_AGENT)
+			.header("Authorization", format!("Bearer {}", self.token.clone()))
+			.header("Dropbox-API-Arg", upload_arg)
+			.header("Content-Type", "application/octet-stream")
+			.body(Body::from(body))
+			.unwrap()
 	}
 
 	#[inline]
@@ -114,20 +139,11 @@ impl DropboxContext {
 			.from_err::<DropboxError>()
 	}
 
-	fn download(&self, _uri: &str, _arg: &str, _file_path: &Path) -> Result<String> {
+	fn download(&self, request: Request<Body>, _file_path: &Path) -> Result<String> {
 		Err(DropboxError::Other(String::from("Not Implemented")))
 	}
 
 	fn upload(&self, _uri: &str, _arg: &str, _file_path: &Path) -> Result<String> {
-		/*
-		let request = Request::builder()
-			.uri(uri)
-			.method(Method::POST)
-			.header("User-Agent", "application/json")
-			.header("Authorization", format!("Bearer {}", self.token.clone()))
-			.body(Body::from(body))
-			.unwrap();
-		*/
 		Err(DropboxError::Other(String::from("Not Implemented")))
 	}
 }

@@ -24,9 +24,9 @@ impl DropboxUsers {
 		&self,
 		arg: GetAccountArg,
 	) -> Result<impl Future<Item = BasicAccount, Error = DropboxError>> {
-		let uri = gen_uri!("users", "get_account");
+		let uri = gen_uri!("users", "get_account")?;
 		let body = serde_json::to_vec(&arg)?;
-		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		let request = self.ctx.create_request(uri, Some(body));
 		Ok(self
 			.ctx
 			.request(request)
@@ -40,9 +40,9 @@ impl DropboxUsers {
 		&self,
 		arg: GetAccountBatchArg,
 	) -> Result<impl Future<Item = Vec<BasicAccount>, Error = DropboxError>> {
-		let uri = gen_uri!("users", "get_account_batch");
+		let uri = gen_uri!("users", "get_account_batch")?;
 		let body = serde_json::to_vec(&arg)?;
-		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		let request = self.ctx.create_request(uri, Some(body));
 		Ok(self
 			.ctx
 			.request(request)
@@ -54,8 +54,8 @@ impl DropboxUsers {
 	pub fn get_current_account(
 		&self,
 	) -> Result<impl Future<Item = FullAccount, Error = DropboxError>> {
-		let uri = gen_uri!("users", "get_current_account");
-		let request = self.ctx.create_request(uri, Method::POST, None);
+		let uri = gen_uri!("users", "get_current_account")?;
+		let request = self.ctx.create_request(uri, None);
 		Ok(self
 			.ctx
 			.request(request)
@@ -65,8 +65,8 @@ impl DropboxUsers {
 
 	/// Get the space usage information for the current user's account.
 	pub fn get_space_usage(&self) -> Result<impl Future<Item = SpaceUsage, Error = DropboxError>> {
-		let uri = gen_uri!("users", "get_space_usage");
-		let request = self.ctx.create_request(uri, Method::POST, None);
+		let uri = gen_uri!("users", "get_space_usage")?;
+		let request = self.ctx.create_request(uri, None);
 		Ok(self
 			.ctx
 			.request(request)
