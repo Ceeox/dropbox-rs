@@ -46,6 +46,7 @@ pub mod users;
 // std uses
 use std::path::Path;
 use std::sync::Arc;
+
 // crate uses
 use hyper::client::HttpConnector;
 use hyper::rt::{Future, Stream};
@@ -59,7 +60,7 @@ use crate::users::DropboxUsers;
 
 // consts or statics
 static BASE_URL: &str = "https://api.dropboxapi.com";
-static UPLOAD_URL: &str = "https://content.dropboxapi.com";
+static CONTENT_URL: &str = "https://content.dropboxapi.com";
 static API_VERSION: &str = "/2";
 static USER_AGENT: &str = concat!(
 	"dropbox-rs (https://github.com/Ceeox/dropbox-rs), ",
@@ -139,18 +140,38 @@ impl DropboxContext {
 			.from_err::<DropboxError>()
 	}
 
-	fn download(&self, request: Request<Body>, _file_path: &Path) -> Result<String> {
-		Err(DropboxError::Other(String::from("Not Implemented")))
+	fn download(
+		&self,
+		request: Request<Body>,
+	//) -> impl Future<Item = Box<(String, hyper::Chunk)>, Error = DropboxError> {
+	) -> Result<()> {
+	    unimplemented!();
+		/*
+		trace!("Request: {:?}", request);
+		self.client
+			.request(request)
+			.and_then(|res| {
+				let res_info = res
+					.headers()
+					.remove("dropbox-api-result")
+					.unwrap()
+					.to_str()
+					.unwrap()
+					.to_owned();
+				let body = res.into_body().concat2();
+				Ok((res_info, body))
+			}).from_err::<DropboxError>()
+		*/
 	}
 
 	fn upload(&self, _uri: &str, _arg: &str, _file_path: &Path) -> Result<String> {
-		Err(DropboxError::Other(String::from("Not Implemented")))
+		unimplemented!();
 	}
 }
 
 impl Clone for DropboxContext {
 	fn clone(&self) -> Self {
-		DropboxContext {
+		Self {
 			client: self.client.clone(),
 			token: Arc::clone(&self.token),
 		}
@@ -160,24 +181,33 @@ impl Clone for DropboxContext {
 #[derive(Clone)]
 pub struct Dropbox {
 	context: DropboxContext,
-	//pub files: DropboxFiles,
-	pub users: DropboxUsers,
+	//files: Option<DropboxFiles>,
+	users: Option<DropboxUsers>,
 }
 
 impl Dropbox {
 	pub fn new(token: &str) -> Result<Dropbox> {
 		let context = DropboxContext::new(token)?;
-		//let files = DropboxFiles::new(&context);
-		let users = DropboxUsers::new(&context);
 		Ok(Dropbox {
 			context,
-			//files,
-			users,
+			//files: None,
+			users: None,
 		})
 	}
 
 	#[inline]
 	pub fn change_token(&mut self, new_token: String) {
 		self.context.change_token(new_token)
+	}
+
+	#[inline]
+	pub fn users(&mut self) -> &DropboxUsers {
+		match self.users {
+			Some(ref users) => users,
+			None => {
+				self.users = Some(DropboxUsers::new(&self.context));
+				self.users.as_ref().unwrap()
+			}
+		}
 	}
 }

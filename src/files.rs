@@ -30,7 +30,7 @@ impl DropboxFiles {
 	) -> Result<impl Future<Item = Metadata, Error = DropboxError>> {
 		let uri = gen_uri!("files", "copy");
 		let body = serde_json::to_vec(&arg)?;
-		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		let request = self.ctx.create_request(uri, Some(body));
 		Ok(self
 			.ctx
 			.request(request)
@@ -49,13 +49,13 @@ impl DropboxFiles {
 		&self,
 		arg: RelocationBatchArg,
 	) -> Result<impl Future<Item = RelocationBatchLaunch, Error = DropboxError>> {
-		let uri = gen_uri!("files", "copy_batch");
+		let uri = gen_uri!("files", "copy_batch")?;
 		let body = serde_json::to_vec(&arg)?;
-		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		let request = self.ctx.create_request(uri, Some(body));
 		Ok(self
 			.ctx
 			.request(request)
-			.and_then(|body| simple_check!(RelocationBatchLaunch, body))
+			.and_then(|body| check!(RelocationBatchLaunch, body))
 			.from_err::<DropboxError>())
 	}
 
@@ -65,67 +65,61 @@ impl DropboxFiles {
 		&self,
 		arg: PollArg,
 	) -> Result<impl Future<Item = RelocationBatchJobStatus, Error = DropboxError>> {
-		let uri = gen_uri!("files", "copy");
+		let uri = gen_uri!("files", "copy")?;
 		let body = serde_json::to_vec(&arg)?;
-		let request = self.ctx.create_request(uri, Method::POST, Some(body));
+		let request = self.ctx.create_request(uri, Some(body));
 		Ok(self
 			.ctx
 			.request(request)
-			.and_then(|body| simple_check!(RelocationBatchJobStatus, PollError, body))
+			.and_then(|body| check!(RelocationBatchJobStatus, PollError, body))
 			.from_err::<DropboxError>())
 	}
 
 	/// Get a copy reference to a file or folder.
 	/// This reference string can be used to save that file or folder to another user's Dropbox
 	/// by passing it to copy_reference/save.
-	pub fn copy_reference_get(&self, arg: GetCopyReferenceArg) -> Result<GetCopyReferenceResult> {
-		let uri = gen_uri!("files", "copy_reference", "get");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<GetCopyReferenceResult>(&resp) {
-			Err(_) => Err(
-				match serde_json::from_str::<Error<GetCopyReferenceError>>(&resp) {
-					Err(_) => DropboxError::Other,
-					Ok(r) => DropboxError::GetCopyReferenceError(r),
-				},
-			),
-			Ok(r) => Ok(r),
-		}
+	pub fn copy_reference_get(
+		&self,
+		arg: GetCopyReferenceArg,
+	) -> Result<impl Future<Item = GetCopyReferenceResult, Error = DropboxError>> {
+		let uri = gen_uri!("files", "copy_reference", "get")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| check!(GetCopyReferenceResult, GetCopyReferenceError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Save a copy reference returned by copy_reference/get to the user's Dropbox.
 	pub fn copy_reference_save(
 		&self,
 		arg: SaveCopyReferenceArg,
-	) -> Result<SaveCopyReferenceResult> {
-		let uri = gen_uri!("files", "copy_reference", "save");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<SaveCopyReferenceResult>(&resp) {
-			Err(_) => Err(
-				match serde_json::from_str::<Error<SaveCopyReferenceError>>(&resp) {
-					Err(_) => DropboxError::Other,
-					Ok(r) => DropboxError::SaveCopyReferenceError(r),
-				},
-			),
-			Ok(r) => Ok(r),
-		}
+	) -> Result<impl Future<Item = SaveCopyReferenceResult, Error = DropboxError>> {
+		let uri = gen_uri!("files", "copy_reference", "save")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| check!(SaveCopyReferenceResult, SaveCopyReferenceError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Create a folder at a given path.
-	pub fn create_folder(&self, arg: CreateFolderArg) -> Result<FolderMetadata> {
-		let uri = gen_uri!("files", "create_folder");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<FolderMetadata>(&resp) {
-			Err(_) => Err(
-				match serde_json::from_str::<Error<CreateFolderError>>(&resp) {
-					Err(_) => DropboxError::Other,
-					Ok(r) => DropboxError::CreateFolderError(r),
-				},
-			),
-			Ok(r) => Ok(r),
-		}
+	pub fn create_folder(
+		&self,
+		arg: CreateFolderArg,
+	) -> Result<impl Future<Item = FolderMetadata, Error = DropboxError>> {
+		let uri = gen_uri!("files", "create_folder")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| check!(FolderMetadata, CreateFolderError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Delete the file or folder at a given path.
@@ -133,80 +127,88 @@ impl DropboxFiles {
 	/// A successful response indicates that the file or folder was deleted.
 	/// The returned metadata will be the corresponding FileMetadata or FolderMetadata
 	/// for the item at time of deletion, and not a DeletedMetadata object.
-	pub fn delete(&self, arg: DeleteArg) -> Result<Metadata> {
-		let uri = gen_uri!("files", "delete");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<Metadata>(&resp) {
-			Err(_) => Err(match serde_json::from_str::<Error<DeleteError>>(&resp) {
-				Err(_) => DropboxError::Other,
-				Ok(r) => DropboxError::DeleteError(r),
-			}),
-			Ok(r) => Ok(r),
-		}
+	pub fn delete(
+		&self,
+		arg: DeleteArg,
+	) -> Result<impl Future<Item = Metadata, Error = DropboxError>> {
+		let uri = gen_uri!("files", "delete")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| check!(Metadata, DeleteError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Delete multiple files/folders at once.
 	/// This route is asynchronous, which returns a job ID immediately and runs the delete batch asynchronously.
 	/// Use delete_batch/check to check the job status.
-	pub fn delete_batch(&self, arg: DeleteBatchArg) -> Result<DeleteBatchLaunch> {
-		let uri = gen_uri!("files", "delete_batch");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<DeleteBatchLaunch>(&resp) {
-			Err(_) => Err(DropboxError::Other),
-			Ok(r) => Ok(r),
-		}
+	pub fn delete_batch(
+		&self,
+		arg: DeleteBatchArg,
+	) -> Result<impl Future<Item = DeleteBatchLaunch, Error = DropboxError>> {
+		let uri = gen_uri!("files", "delete_batch")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| simple_check!(DeleteBatchLaunch, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Returns the status of an asynchronous job for delete_batch.
 	/// If success, it returns list of result for each entry.
-	pub fn delete_batch_check(&self, arg: PollArg) -> Result<DeleteBatchJobStatus> {
-		let uri = gen_uri!("files", "delete_batch", "check");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<DeleteBatchJobStatus>(&resp) {
-			Err(_) => Err(match serde_json::from_str::<Error<PollError>>(&resp) {
-				Err(_) => DropboxError::Other,
-				Ok(r) => DropboxError::PollError(r),
-			}),
-			Ok(r) => Ok(r),
-		}
+	pub fn delete_batch_check(
+		&self,
+		arg: PollArg,
+	) -> Result<impl Future<Item = DeleteBatchJobStatus, Error = DropboxError>> {
+		let uri = gen_uri!("files", "delete_batch", "check")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.request(request)
+			.and_then(|body| check!(DeleteBatchJobStatus, PollError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Download a file from a user's Dropbox.
-	pub fn _download(&self, arg: DownloadArg, file_path: &Path) -> Result<FileMetadata> {
-		let uri = gen_upload_uri!("files", "download");
-		let body: String = serde_json::to_string(&arg)?;
-		let file_info = self.download(&uri, &body, &file_path)?;
-		match serde_json::from_str::<FileMetadata>(&file_info) {
-			Err(_) => {
-				return Err(
-					match serde_json::from_str::<Error<DownloadError>>(&file_info) {
-						Err(_) => DropboxError::Other,
-						Ok(r) => DropboxError::DownloadError(r),
-					},
-				)
-			}
-			Ok(r) => Ok(r),
-		}
+	pub fn download(
+		&self,
+		arg: DownloadArg,
+		file_path: &Path,
+	) -> Result<impl Future<Item = FileMetadata, Error = DropboxError>> {
+		let uri = gen_upload_uri!("files", "download")?;
+		let download_arg = serde_json::to_string(&arg)?;
+		let request = self.ctx.create_download_request(uri, download_arg);
+		Ok(self
+			.ctx
+			.download(request, file_path)
+			.and_then(|body| check!(FileMetadata, DownloadError, body))
+			.from_err::<DropboxError>())
+	}
+
+	// TODO: implement the DownloadZIP api function call
+	pub fn download_zip(&self) -> Result<()> {
+		Err(DropboxError::Other("Not Implemented"))
 	}
 
 	/// Returns the metadata for a file or folder.
 	/// Note: Metadata for the root folder is unsupported.
-	pub fn get_metadata(&self, arg: GetMetadataArg) -> Result<Metadata> {
-		let uri = gen_uri!("files", "get_metadata");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<Metadata>(&resp) {
-			Err(_) => Err(
-				match serde_json::from_str::<Error<GetMetadataError>>(&resp) {
-					Err(_) => DropboxError::Other,
-					Ok(r) => DropboxError::GetMetadataError(r),
-				},
-			),
-			Ok(r) => Ok(r),
-		}
+	pub fn get_metadata(
+		&self,
+		arg: GetMetadataArg,
+	) -> Result<impl Future<Item = Metadata, Error = DropboxError>> {
+		let uri = gen_uri!("files", "get_metadata")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.download(request, file_path)
+			.and_then(|body| check!(Metadata, GetMetadataError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Get a preview for a file.
@@ -214,60 +216,55 @@ impl DropboxFiles {
 	/// .ai, .doc, .docm, .docx, .eps, .odp, .odt, .pps, .ppsm, .ppsx, .ppt, .pptm, .pptx, .rtf.
 	/// HTML previews are generated for files with the following extensions: .csv, .ods, .xls, .xlsm, .xlsx.
 	/// Other formats will return an unsupported extension error.
-	pub fn get_preview(&self, arg: PreviewArg, file_path: &Path) -> Result<FileMetadata> {
-		let uri = gen_upload_uri!("files", "get_preview");
-		let body: String = serde_json::to_string(&arg)?;
-		let file_info = self.download(&uri, &body, file_path)?;
-		match serde_json::from_str::<FileMetadata>(&file_info) {
-			Err(_) => {
-				return Err(
-					match serde_json::from_str::<Error<PreviewError>>(&file_info) {
-						Err(_) => DropboxError::Other,
-						Ok(r) => DropboxError::PreviewError(r),
-					},
-				)
-			}
-			Ok(r) => Ok(r),
-		}
+	pub fn get_preview(
+		&self,
+		arg: PreviewArg,
+		file_path: &Path,
+	) -> Result<impl Future<Item = FileMetadata, Error = DropboxError>> {
+		let uri = gen_upload_uri!("files", "get_preview")?;
+		let download_arg = serde_json::to_string(&arg)?;
+		let request = self.ctx.create_download_request(uri, download_arg);
+		Ok(self
+			.ctx
+			.download(request, file_path)
+			.and_then(|body| check!(FileMetadata, PreviewError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Get a temporary link to stream content of a file.
 	/// This link will expire in four hours and afterwards you will get 410 Gone.
 	/// Content-Type of the link is determined automatically by the file's mime type.
-	pub fn get_temporary_link(&self, arg: GetTemporaryLinkArg) -> Result<GetTemporaryLinkResult> {
-		let uri = gen_uri!("files", "get_temporary_link");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<GetTemporaryLinkResult>(&resp) {
-			Err(_) => Err(
-				match serde_json::from_str::<Error<GetTemporaryLinkError>>(&resp) {
-					Err(_) => DropboxError::Other,
-					Ok(r) => DropboxError::GetTemporaryLinkError(r),
-				},
-			),
-			Ok(r) => Ok(r),
-		}
+	pub fn get_temporary_link(
+		&self,
+		arg: GetTemporaryLinkArg,
+	) -> Result<impl Future<Item = GetTemporaryLinkResult, Error = DropboxError>> {
+		let uri = gen_uri!("files", "get_temporary_link")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.download(request, file_path)
+			.and_then(|body| check!(GetTemporaryLinkResult, GetTemporaryLinkError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Get a thumbnail for an image.
 	/// This method currently supports files with the following file extensions:
 	/// jpg, jpeg, png, tiff, tif, gif and bmp.
 	/// Photos that are larger than 20MB in size won't be converted to a thumbnail.
-	pub fn get_thumbnail(&self, arg: ThumbnailArg, file_path: &Path) -> Result<FileMetadata> {
-		let uri = gen_upload_uri!("files", "get_thumbnail");
-		let body: String = serde_json::to_string(&arg)?;
-		let file_info = self.download(&uri, &body, file_path)?;
-		match serde_json::from_str::<FileMetadata>(&file_info) {
-			Err(_) => {
-				return Err(
-					match serde_json::from_str::<Error<ThumbnailError>>(&file_info) {
-						Err(_) => DropboxError::Other,
-						Ok(r) => DropboxError::ThumbnailError(r),
-					},
-				)
-			}
-			Ok(r) => Ok(r),
-		}
+	pub fn get_thumbnail(
+		&self,
+		arg: ThumbnailArg,
+		file_path: &Path,
+	) -> Result<impl Future<Item = FileMetadata, Error = DropboxError>> {
+		let uri = gen_upload_uri!("files", "get_thumbnail")?;
+		let body = serde_json::to_string(&arg)?;
+		let request = self.ctx.create_download_request(uri, download_arg);
+		Ok(self
+			.ctx
+			.download(request, file_path)
+			.and_then(|body| check!(FileMetadata, ThumbnailError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Starts returning the contents of a folder.
@@ -287,19 +284,18 @@ impl DropboxFiles {
 	/// Note: auth.RateLimitError may be returned if multiple list_folder or list_folder/continue
 	/// calls with same parameters are made simultaneously by same API app for same user.
 	/// If your app implements retry logic, please hold off the retry until the previous request finishes.
-	pub fn list_folder(&self, arg: ListFolderArg) -> Result<ListFolderResult> {
-		let uri = gen_uri!("files", "list_folder");
-		let body: String = serde_json::to_string(&arg)?;
-		let resp: String = self.ctx.send_request(&uri, &body)?;
-		match serde_json::from_str::<ListFolderResult>(&resp) {
-			Err(_) => Err(
-				match serde_json::from_str::<Error<ListFolderError>>(&resp) {
-					Err(_) => DropboxError::Other,
-					Ok(r) => DropboxError::ListFolderError(r),
-				},
-			),
-			Ok(r) => Ok(r),
-		}
+	pub fn list_folder(
+		&self,
+		arg: ListFolderArg,
+	) -> Result<impl Future<Item = ListFolderResult, Error = DropboxError>> {
+		let uri = gen_uri!("files", "list_folder")?;
+		let body = serde_json::to_vec(&arg)?;
+		let request = self.ctx.create_request(uri, Some(body));
+		Ok(self
+			.ctx
+			.download(request, file_path)
+			.and_then(|body| check!(ListFolderResult, ListFolderError, body))
+			.from_err::<DropboxError>())
 	}
 
 	/// Once a cursor has been retrieved from list_folder,
@@ -441,54 +437,6 @@ impl DropboxFiles {
 			},
 			Ok(r) => Err(DropboxError::DeleteError(r)),
 		}
-	}
-
-	/// PREVIEW - may change or disappear without notice
-	///
-	/// Add custom properties to a file using a filled property template.
-	/// See properties/template/add to create new property templates.
-	pub fn properties_add(&self) -> Result<()> {
-		Err(DropboxError::Other)
-	}
-
-	/// PREVIEW - may change or disappear without notice
-	///
-	/// Overwrite custom properties from a specified template associated with a file.
-	pub fn properties_overwride(&self) -> Result<()> {
-		Err(DropboxError::Other)
-	}
-
-	/// PREVIEW - may change or disappear without notice
-	///
-	/// Remove all custom properties from a specified template associated with a file.
-	/// To remove specific property key value pairs, see properties/update.
-	/// To update a property template, see properties/template/update.
-	/// Property templates can't be removed once created.
-	pub fn properties_remove(&self) -> Result<()> {
-		Err(DropboxError::Other)
-	}
-
-	/// PREVIEW - may change or disappear without notice
-	///
-	/// Get the schema for a specified template.
-	pub fn properties_template_get(&self) -> Result<()> {
-		Err(DropboxError::Other)
-	}
-
-	/// PREVIEW - may change or disappear without notice
-	///
-	/// Get the property template identifiers for a user.
-	/// To get the schema of each template use properties/template/get.
-	pub fn properties_template_list(&self) -> Result<()> {
-		Err(DropboxError::Other)
-	}
-
-	/// PREVIEW - may change or disappear without notice
-	///
-	/// Add, update or remove custom properties from a specified template associated with a file.
-	/// Fields that already exist and not described in the request will not be modified.
-	pub fn properties_update(&self) -> Result<()> {
-		Err(DropboxError::Other)
 	}
 
 	/// Restore a file to a specific revision.
