@@ -108,7 +108,7 @@ impl DropboxContext {
 			.header("Authorization", format!("Bearer {}", self.token.clone()))
 			.header("Dropbox-API-Arg", download_arg)
 			.body(Body::empty())
-			.unwrap()
+			.expect("Failed to create download request")
 	}
 
 	fn create_upload_request(&self, uri: Uri, upload_arg: String, body: Vec<u8>) -> Request<Body> {
@@ -121,7 +121,7 @@ impl DropboxContext {
 			.header("Dropbox-API-Arg", upload_arg)
 			.header("Content-Type", "application/octet-stream")
 			.body(Body::from(body))
-			.unwrap()
+			.expect("Failed to create upload request")
 	}
 
 	#[inline]
